@@ -1,0 +1,43 @@
+{
+  "name": "metalsmith-safe-links",
+  "version": "1.0.5",
+  "description": "Metalsmith plugin to strip protocal and hostname from local links and to add target and rel attributes to external links",
+  "main": "lib/index.js",
+  "engines": {
+    "node": ">= 14.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "test": "mocha ./tests/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wernerglinka/metalsmith-links.git"
+  },
+  "keywords": [
+    "metalsmith",
+    "plugin"
+  ],
+  "author": "Werner Glinka <werner@glinka.co>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wernerglinka/metalsmith-links/issues"
+  },
+  "homepage": "https://github.com/wernerglinka/metalsmith-links#readme",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.10",
+    "debug": "^4.3.3",
+    "metalsmith": "^2.4.1"
+  },
+  "devDependencies": {
+    "babel-eslint": "^7.2.3",
+    "chai": "^4.0.2",
+    "eslint": "^8.3.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "mocha": "^9.2.0",
+    "prettier": "^2.4.1"
+  }
+}
