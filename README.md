@@ -21,11 +21,11 @@ npm i metalsmith-safe-links --save
 ```
 const metalsmith = require('metalsmith');
 const layouts = require('@metalsmith/layouts')
-const metalsmithLinks = require('metalsmith-links');
+const metalsmithSafeLinks = require('metalsmith-safe-links');
 
 metalsmith(__dirname)
   .use(layouts())
-  .use(metalsmithLinks({
+  .use(metalsmithSafeLinks({
     hostnames: ["www.livesite.com", "stagingsite.com"]
   }))
   .build();
@@ -39,7 +39,7 @@ An array of hostnames. The plugin will strip `<protocol://hostname>` from all li
 
 ```
 Metalsmith(__dirname)
-  .use(metalsmithLinks({
+  .use(metalsmithSafeLinks({
     hostnames: ["www.livesite.com", "stagingsite.com"]
   }))
 ```
@@ -92,7 +92,7 @@ To use this plugin with the Metalsmith CLI, add `metalsmith-safe-links` to the `
 
 
 ## Authors
-+ [werner@glinka.co](https://github.com/wernerglinka)
+[werner@glinka.co](https://github.com/wernerglinka)
 
 
 ## License
