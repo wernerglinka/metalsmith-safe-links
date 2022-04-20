@@ -23,7 +23,7 @@ describe('metalsmith-prism', () => {
 
     metal
       .use(metalsmithLinks({
-          hostNames: ["www.potatohead.com"]
+          hostnames: ["www.potatohead.com"]
         }))
       .build( err => {
 
@@ -45,7 +45,7 @@ describe('metalsmith-prism', () => {
 
     metal
       .use(metalsmithLinks({
-          hostNames: ["www.potatohead.com"]
+          hostnames: ["www.potatohead.com"]
         }))
       .build( err => {
 
