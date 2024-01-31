@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wernerglinka/metalsmith-links.git"
+    "url": "git+https://github.com/wernerglinka/metalsmith-safe-links.git"
   },
   "keywords": [
     "metalsmith",
@@ -24,9 +24,9 @@
   "author": "Werner Glinka <werner@glinka.co>",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/wernerglinka/metalsmith-links/issues"
+    "url": "https://github.com/wernerglinka/metalsmith-safe-links/issues"
   },
-  "homepage": "https://github.com/wernerglinka/metalsmith-links#readme",
+  "homepage": "https://github.com/wernerglinka/metalsmith-safe-links#readme",
   "dependencies": {
     "cheerio": "^1.0.0-rc.12",
     "debug": "^4.3.4"
