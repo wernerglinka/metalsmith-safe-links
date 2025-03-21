@@ -18,11 +18,38 @@ As markdown syntax only allows for _alt_ and _title_ attributes, content editors
 npm i metalsmith-safe-links --save
 ```
 
+### Compatibility
+
+This plugin works with:
+
+- **Node.js**: Requires Node.js 18.0.0 or higher
+- **Module formats**: Supports both ESM and CommonJS
+- **Metalsmith**: Compatible with Metalsmith v2.0.0 and above
+
 ## Usage
 
+This plugin supports both ESM and CommonJS environments.
+
+### ESM (ECMAScript Modules)
+
+```js
+import metalsmith from 'metalsmith';
+import layouts from '@metalsmith/layouts';
+import metalsmithSafeLinks from 'metalsmith-safe-links';
+
+metalsmith(__dirname)
+  .use(layouts())
+  .use(metalsmithSafeLinks({
+    hostnames: ["www.livesite.com", "stagingsite.com"]
+  }))
+  .build();
 ```
+
+### CommonJS
+
+```js
 const metalsmith = require('metalsmith');
-const layouts = require('@metalsmith/layouts')
+const layouts = require('@metalsmith/layouts');
 const metalsmithSafeLinks = require('metalsmith-safe-links');
 
 metalsmith(__dirname)
@@ -108,6 +135,30 @@ To use this plugin with the Metalsmith CLI, add `metalsmith-safe-links` to the `
 }
 ```
 
+## Technical Details
+
+### Dual Module Support
+
+This plugin is built as a dual module, supporting both ESM and CommonJS environments:
+
+- **ESM**: Import with `import metalsmithSafeLinks from 'metalsmith-safe-links'`
+- **CommonJS**: Require with `const metalsmithSafeLinks = require('metalsmith-safe-links')`
+
+The package exports are configured in package.json:
+
+```json
+{
+  "main": "./lib/index.cjs",
+  "module": "./lib/index.js",
+  "exports": {
+    "import": "./lib/index.js",
+    "require": "./lib/index.cjs"
+  }
+}
+```
+
+Both module formats are automatically generated during the build process using [microbundle](https://github.com/developit/microbundle).
+
 ## Authors
 
 [werner@glinka.co](https://github.com/wernerglinka)
@@ -122,7 +173,7 @@ Code released under [the ISC license](https://github.com/wernerglinka/metalsmith
 [metalsmith-url]: https://metalsmith.io
 [license-badge]: https://img.shields.io/github/license/wernerglinka/metalsmith-safe-links
 [license-url]: LICENSE
-[coverage-badge]: https://img.shields.io/badge/coverage-91%25-brightgreen
+[coverage-badge]: https://img.shields.io/badge/coverage-97%25-brightgreen
 [coverage-url]: #test-coverage
 [modules-badge]: https://img.shields.io/badge/modules-ESM%2FCJS-blue
 
@@ -132,6 +183,6 @@ This plugin maintains high statement and line coverage for the source code. Cove
 
 File      | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
 ----------|---------|----------|---------|---------|-------------------
-All files | 90.97 | 53.84 | 66.66 | 90.97 |
- src | 90.97 | 53.84 | 66.66 | 90.97 | 38-40,60-62,86-87,112-113,132-133
+All files | 97.16 | 87.5 | 66.66 | 97.16 |
+ src | 97.16 | 87.5 | 66.66 | 97.16 | 120-121,140-141
 
