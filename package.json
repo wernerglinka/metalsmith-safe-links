@@ -1,6 +1,6 @@
 {
   "name": "metalsmith-safe-links",
-  "version": "1.4.3",
+  "version": "1.5.0",
   "description": "Metalsmith plugin to strip protocol and hostname from local links and to add target and rel attributes to external links",
   "main": "./lib/index.cjs",
   "module": "./lib/index.js",
