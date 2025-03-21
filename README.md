@@ -5,6 +5,8 @@ Metalsmith plugin to strip `<protocol://hostname>` from local links and to add _
 [![metalsmith: plugin][metalsmith-badge]][metalsmith-url]
 [![npm: version][npm-badge]][npm-url]
 [![license: ISC][license-badge]][license-url]
+[![coverage][coverage-badge]][coverage-url]
+[![ESM/CommonJS][modules-badge]][npm-url]
 
 As markdown syntax only allows for _alt_ and _title_ attributes, content editors normally must use HTML to add other link attributes. This plugin negates the use of HTML for links in a markdown document.
 
@@ -105,3 +107,16 @@ Code released under [the ISC license](https://github.com/wernerglinka/metalsmith
 [metalsmith-url]: https://metalsmith.io
 [license-badge]: https://img.shields.io/github/license/wernerglinka/metalsmith-safe-links
 [license-url]: LICENSE
+[coverage-badge]: https://img.shields.io/badge/coverage-90%25-brightgreen
+[coverage-url]: #test-coverage
+[modules-badge]: https://img.shields.io/badge/modules-ESM%2FCJS-blue
+
+## Test Coverage
+
+This plugin maintains high statement and line coverage for the source code. Coverage is verified during the release process using the c8 coverage tool.
+
+File      | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
+----------|---------|----------|---------|---------|-------------------
+All files | 90.36 | 53.84 | 100 | 90.36 |
+ src | 90.36 | 53.84 | 100 | 90.36 | 26,30-32,45-46,82-83
+

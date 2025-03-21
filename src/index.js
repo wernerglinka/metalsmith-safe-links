@@ -1,10 +1,12 @@
+'use strict';
+
 import * as cheerio from 'cheerio';
 import debugModule from 'debug';
+const debug = debugModule('metalsmith-safe-links');
 import { extname } from 'path';
 import url from 'url';
 
-const debug = debugModule('metalsmith-safe-links');
-const isHTMLFile = filePath => {
+const isHTMLFile = (filePath) => {
   return /\.html|\.htm/.test(extname(filePath));
 };
 
@@ -19,29 +21,34 @@ const isHTMLFile = filePath => {
  *   @property {array} hostnames
  */
 
-const safeLinks = options => {
+const safeLinks = (options) => {
   options = options || {
-    hostnames: []
+    hostnames: [],
   };
+
   if (!options.hostnames.length) {
     console.log("Missing Host Name(s)");
     return;
   }
+
   const hostnames = options.hostnames;
+
   return (files, metalsmith, done) => {
     // Use metalsmith's built-in debug if available
     const debugFn = metalsmith.debug ? metalsmith.debug('metalsmith-safe-links') : debug;
     debugFn('Processing links with options: %o', options);
+    
     setImmediate(done);
+
     Object.keys(files).forEach(file => {
       if (!isHTMLFile(file)) {
         return;
       }
+
       const contents = files[file].contents.toString();
-      const $ = cheerio.load(contents, {
-        decodeEntities: false
-      }, true);
-      $('a').each(function () {
+      const $ = cheerio.load(contents, { decodeEntities: false }, true);
+
+      $('a').each(function() {
         const thisLink = $(this);
         const linkAttributes = thisLink[0].attribs;
         const urlString = typeof linkAttributes.href === "string" ? url.parse(linkAttributes.href, true) : null;
@@ -61,15 +68,16 @@ const safeLinks = options => {
           }
         }
       });
+
       files[file].contents = Buffer.from($.html());
     });
   };
 };
 
+// ESM export
+export default safeLinks;
+
 // CommonJS export compatibility
 if (typeof module !== 'undefined') {
   module.exports = safeLinks;
 }
-
-export { safeLinks as default };
-//# sourceMappingURL=index.js.map
