@@ -47,8 +47,7 @@
   },
   "homepage": "https://github.com/wernerglinka/metalsmith-safe-links#readme",
   "dependencies": {
-    "cheerio": "^1.0.0",
-    "debug": "^4.4.0"
+    "cheerio": "^1.0.0"
   },
   "devDependencies": {
     "babel-eslint": "^10.1.0",

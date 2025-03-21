@@ -69,7 +69,19 @@ will be transformed into
 
 ## Debug
 
-To enable debug logs, set the `DEBUG` environment variable to `metalsmith-safe-links`:
+This plugin uses Metalsmith's built-in debug support.
+
+To enable debug logs, use Metalsmith's debug option or the DEBUG environment variable:
+
+```javascript
+// Enable debug in your metalsmith build
+Metalsmith(__dirname)
+  .debug(true)  // This enables debug for all plugins
+  .use(metalsmithSafeLinks({ hostnames: ["example.com"] }))
+  .build();
+```
+
+Alternatively, enable debug only for specific namespaces:
 
 ```
 DEBUG=metalsmith-safe-links
@@ -107,7 +119,7 @@ Code released under [the ISC license](https://github.com/wernerglinka/metalsmith
 [metalsmith-url]: https://metalsmith.io
 [license-badge]: https://img.shields.io/github/license/wernerglinka/metalsmith-safe-links
 [license-url]: LICENSE
-[coverage-badge]: https://img.shields.io/badge/coverage-90%25-brightgreen
+[coverage-badge]: https://img.shields.io/badge/coverage-91%25-brightgreen
 [coverage-url]: #test-coverage
 [modules-badge]: https://img.shields.io/badge/modules-ESM%2FCJS-blue
 
@@ -117,6 +129,6 @@ This plugin maintains high statement and line coverage for the source code. Cove
 
 File      | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
 ----------|---------|----------|---------|---------|-------------------
-All files | 90.36 | 53.84 | 100 | 90.36 |
- src | 90.36 | 53.84 | 100 | 90.36 | 26,30-32,45-46,82-83
+All files | 90.97 | 53.84 | 66.66 | 90.97 |
+ src | 90.97 | 53.84 | 66.66 | 90.97 | 38-40,60-62,86-87,112-113,132-133
 
