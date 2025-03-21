@@ -21,7 +21,7 @@ const isHTMLFile = (filePath) => /\.html$|\.htm$/i.test(extname(filePath));
  * Metalsmith plugin to process all site links:
  * 1. Strips protocol and hostname from links to local sites
  * 2. Adds target="_blank" and rel="noopener noreferrer" to external links
- * 
+ *
  * @param {Object} options - Plugin options
  * @param {string[]} options.hostnames - Array of hostnames considered "local"
  * @returns {Function} Metalsmith plugin function
@@ -55,43 +55,43 @@ const safeLinks = (options = {}) => {
 
     // Get HTML files only
     const htmlFiles = Object.keys(files).filter(isHTMLFile);
-    
+
     if (htmlFiles.length === 0) {
       debug('No HTML files found to process');
       return setImmediate(done);
     }
-    
+
     debug(`Processing ${htmlFiles.length} HTML files`);
-    
+
     // Process each HTML file
-    htmlFiles.forEach(file => {
+    htmlFiles.forEach((file) => {
       const contents = files[file].contents.toString();
-      
+
       // Load content into cheerio
-      const $ = cheerio.load(contents, { 
+      const $ = cheerio.load(contents, {
         decodeEntities: false
       });
-      
+
       // Process all links
       let linkCount = 0;
       let localLinkCount = 0;
       let externalLinkCount = 0;
-      
-      $('a').each(function() {
+
+      $('a').each(function () {
         const thisLink = $(this);
         const linkAttributes = thisLink[0].attribs;
         const href = linkAttributes.href;
-        
+
         if (!href || typeof href !== 'string') {
           return;
         }
-        
+
         linkCount++;
-        
+
         // Parse URL
         try {
           const urlData = parseUrl(href, true);
-          
+
           // Only process links with protocol and hostname
           if (urlData.protocol && urlData.hostname) {
             // Check if hostname is in our "local" list
@@ -112,14 +112,14 @@ const safeLinks = (options = {}) => {
           debug('Error parsing URL %s: %s', href, err.message);
         }
       });
-      
+
       // Save statistics
       debug(`File ${file}: processed ${linkCount} links (${localLinkCount} local, ${externalLinkCount} external)`);
-      
+
       // Update file contents
       files[file].contents = Buffer.from($.html());
     });
-    
+
     setImmediate(done);
   };
 };

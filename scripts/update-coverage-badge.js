@@ -11,41 +11,41 @@ const __dirname = path.dirname(__filename);
 const rootDir = path.join(__dirname, '..');
 
 function determineBadgeColor(percentage) {
-  if (percentage >= 90) return 'brightgreen';
-  if (percentage >= 80) return 'green';
-  if (percentage >= 70) return 'yellowgreen';
-  if (percentage >= 60) return 'yellow';
-  if (percentage >= 50) return 'orange';
+  if (percentage >= 90) {return 'brightgreen';}
+  if (percentage >= 80) {return 'green';}
+  if (percentage >= 70) {return 'yellowgreen';}
+  if (percentage >= 60) {return 'yellow';}
+  if (percentage >= 50) {return 'orange';}
   return 'red';
 }
 
 function parseC8Report(output) {
   try {
     const lines = output.split('\n');
-    const summaryLineIndex = lines.findIndex(line => line.includes('All files'));
-    
+    const summaryLineIndex = lines.findIndex((line) => line.includes('All files'));
+
     if (summaryLineIndex === -1) {
       process.stderr.write('Could not find summary line in coverage report\n');
       return null;
     }
-    
+
     // Parse the summary line
     const summaryLine = lines[summaryLineIndex];
-    const summaryParts = summaryLine.split('|').map(part => part.trim());
-    
+    const summaryParts = summaryLine.split('|').map((part) => part.trim());
+
     if (summaryParts.length < 5) {
       process.stderr.write('Summary line format is not as expected\n');
       return null;
     }
-    
+
     // Extract the file-specific coverage information
     const filesData = [];
     const fileLineIndex = summaryLineIndex + 1;
-    
+
     if (fileLineIndex < lines.length) {
       const fileLine = lines[fileLineIndex];
-      const fileParts = fileLine.split('|').map(part => part.trim());
-      
+      const fileParts = fileLine.split('|').map((part) => part.trim());
+
       if (fileParts.length >= 5) {
         filesData.push({
           path: 'src',
@@ -57,7 +57,7 @@ function parseC8Report(output) {
         });
       }
     }
-    
+
     return {
       summary: {
         statements: summaryParts[1],
@@ -178,18 +178,18 @@ async function useHardcodedValues() {
 async function main() {
   try {
     process.stderr.write('Updating coverage badge in README.md...\n');
-    
+
     // Run the full test suite to collect coverage
     process.stderr.write('Running full test suite for coverage data...\n');
     execSync('npm test', { stdio: 'inherit' });
-    
+
     // Get the coverage data from the c8 report
     process.stderr.write('Extracting coverage data from report...\n');
     const coverageOutput = execSync('npx c8 report --reporter=text', { encoding: 'utf-8' });
-    
+
     // Parse the coverage report
     const coverageData = parseC8Report(coverageOutput);
-    
+
     if (coverageData) {
       process.stderr.write(`Successfully parsed coverage data\n`);
       await updateReadme(coverageData);

@@ -37,7 +37,7 @@ metalsmith(__dirname)
 
 ### hostNames
 
-An array of hostnames. The plugin will strip `<protocol://hostname>` from all links with these names. 
+An array of hostnames. The plugin will strip `<protocol://hostname>` from all links with these names.
 
 ```
 Metalsmith(__dirname)
@@ -47,22 +47,27 @@ Metalsmith(__dirname)
 ```
 
 ## Example
+
 An **internal** markdown link
+
 ```
 [Go to this page](https://www.livesite.com/this-page/)
 ```
 
 will be transformed into
+
 ```
 <a href="/this-page/">Go to this page</a>
 ```
 
 An **external** markdown link
+
 ```
 [Go to this site](https://www.externalsite.com/)
 ```
 
 will be transformed into
+
 ```
 <a href="https://www.externalsite.com/" target="_blank" rel="noopener noreferrer">Go to this site</a>
 ```
@@ -76,8 +81,8 @@ To enable debug logs, use Metalsmith's debug option or the DEBUG environment var
 ```javascript
 // Enable debug in your metalsmith build
 Metalsmith(__dirname)
-  .debug(true)  // This enables debug for all plugins
-  .use(metalsmithSafeLinks({ hostnames: ["example.com"] }))
+  .debug(true) // This enables debug for all plugins
+  .use(metalsmithSafeLinks({ hostnames: ['example.com'] }))
   .build();
 ```
 
@@ -103,11 +108,9 @@ To use this plugin with the Metalsmith CLI, add `metalsmith-safe-links` to the `
 }
 ```
 
-
-
 ## Authors
-[werner@glinka.co](https://github.com/wernerglinka)
 
+[werner@glinka.co](https://github.com/wernerglinka)
 
 ## License
 
@@ -127,8 +130,7 @@ Code released under [the ISC license](https://github.com/wernerglinka/metalsmith
 
 This plugin maintains high statement and line coverage for the source code. Coverage is verified during the release process using the c8 coverage tool.
 
-File      | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
-----------|---------|----------|---------|---------|-------------------
-All files | 90.97 | 53.84 | 66.66 | 90.97 |
- src | 90.97 | 53.84 | 66.66 | 90.97 | 38-40,60-62,86-87,112-113,132-133
-
+| File      | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                 |
+| --------- | ------- | -------- | ------- | ------- | --------------------------------- |
+| All files | 90.97   | 53.84    | 66.66   | 90.97   |
+| src       | 90.97   | 53.84    | 66.66   | 90.97   | 38-40,60-62,86-87,112-113,132-133 |
