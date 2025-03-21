@@ -130,7 +130,8 @@ Code released under [the ISC license](https://github.com/wernerglinka/metalsmith
 
 This plugin maintains high statement and line coverage for the source code. Coverage is verified during the release process using the c8 coverage tool.
 
-| File      | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                 |
-| --------- | ------- | -------- | ------- | ------- | --------------------------------- |
-| All files | 90.97   | 53.84    | 66.66   | 90.97   |
-| src       | 90.97   | 53.84    | 66.66   | 90.97   | 38-40,60-62,86-87,112-113,132-133 |
+File      | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
+----------|---------|----------|---------|---------|-------------------
+All files | 90.97 | 53.84 | 66.66 | 90.97 |
+ src | 90.97 | 53.84 | 66.66 | 90.97 | 38-40,60-62,86-87,112-113,132-133
+
