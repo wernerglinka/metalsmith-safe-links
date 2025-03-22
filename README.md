@@ -2,31 +2,23 @@
 
 Metalsmith plugin to strip `<protocol://hostname>` from local links and to add _target_ and _rel_ attributes to external links.
 
+As markdown syntax only allows for _alt_ and _title_ attributes, content editors normally must use HTML to add other link attributes. This plugin negates the use of HTML for links in a markdown document.
+
 [![metalsmith: plugin][metalsmith-badge]][metalsmith-url]
 [![npm: version][npm-badge]][npm-url]
 [![license: ISC][license-badge]][license-url]
 [![coverage][coverage-badge]][coverage-url]
 [![ESM/CommonJS][modules-badge]][npm-url]
 
-As markdown syntax only allows for _alt_ and _title_ attributes, content editors normally must use HTML to add other link attributes. This plugin negates the use of HTML for links in a markdown document.
-
-**This plugin must be used after markdown has been transformed into html**
 
 ## Installation
 
 ```
-npm i metalsmith-safe-links --save
+npm i metalsmith-safe-links
 ```
 
-### Compatibility
-
-This plugin works with:
-
-- **Node.js**: Requires Node.js 18.0.0 or higher
-- **Module formats**: Supports both ESM and CommonJS
-- **Metalsmith**: Compatible with Metalsmith v2.0.0 and above
-
 ## Usage
+**This plugin must be used after markdown has been transformed into html**
 
 This plugin supports both ESM and CommonJS environments.
 
@@ -34,10 +26,12 @@ This plugin supports both ESM and CommonJS environments.
 
 ```js
 import metalsmith from 'metalsmith';
+import markdown from '@metalsmith/markdown';
 import layouts from '@metalsmith/layouts';
 import metalsmithSafeLinks from 'metalsmith-safe-links';
 
 metalsmith(__dirname)
+  .use(markdown())
   .use(layouts())
   .use(metalsmithSafeLinks({
     hostnames: ["www.livesite.com", "stagingsite.com"]
@@ -49,10 +43,12 @@ metalsmith(__dirname)
 
 ```js
 const metalsmith = require('metalsmith');
+const markdown = require('@metalsmith/markdown');
 const layouts = require('@metalsmith/layouts');
 const metalsmithSafeLinks = require('metalsmith-safe-links');
 
 metalsmith(__dirname)
+  .use(markdown())
   .use(layouts())
   .use(metalsmithSafeLinks({
     hostnames: ["www.livesite.com", "stagingsite.com"]
@@ -62,16 +58,9 @@ metalsmith(__dirname)
 
 ## Options
 
-### hostNames
+- **hostNames** [array] - an array of hostnames. The plugin will strip `<protocol://hostname>` from all links with these names.
 
-An array of hostnames. The plugin will strip `<protocol://hostname>` from all links with these names.
 
-```
-Metalsmith(__dirname)
-  .use(metalsmithSafeLinks({
-    hostnames: ["www.livesite.com", "stagingsite.com"]
-  }))
-```
 
 ## Example
 
@@ -101,22 +90,18 @@ will be transformed into
 
 ## Debug
 
-This plugin uses Metalsmith's built-in debug support.
+To log debug output, set the DEBUG environment variable to `metalsmith-safe-links`"
 
-To enable debug logs, use Metalsmith's debug option or the DEBUG environment variable:
+Linux/Mac:
 
 ```javascript
-// Enable debug in your metalsmith build
-Metalsmith(__dirname)
-  .debug(true) // This enables debug for all plugins
-  .use(metalsmithSafeLinks({ hostnames: ['example.com'] }))
-  .build();
-```
-
-Alternatively, enable debug only for specific namespaces:
-
-```
 DEBUG=metalsmith-safe-links
+```
+
+Windows:
+
+```javascript
+set DEBUG=metalsmith-safe-links
 ```
 
 ## CLI usage
@@ -135,29 +120,7 @@ To use this plugin with the Metalsmith CLI, add `metalsmith-safe-links` to the `
 }
 ```
 
-## Technical Details
 
-### Dual Module Support
-
-This plugin is built as a dual module, supporting both ESM and CommonJS environments:
-
-- **ESM**: Import with `import metalsmithSafeLinks from 'metalsmith-safe-links'`
-- **CommonJS**: Require with `const metalsmithSafeLinks = require('metalsmith-safe-links')`
-
-The package exports are configured in package.json:
-
-```json
-{
-  "main": "./lib/index.cjs",
-  "module": "./lib/index.js",
-  "exports": {
-    "import": "./lib/index.js",
-    "require": "./lib/index.cjs"
-  }
-}
-```
-
-Both module formats are automatically generated during the build process using [microbundle](https://github.com/developit/microbundle).
 
 ## Authors
 
