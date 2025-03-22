@@ -120,6 +120,9 @@ To use this plugin with the Metalsmith CLI, add `metalsmith-safe-links` to the `
 }
 ```
 
+## Test Coverage
+
+This plugin maintains high statement and line coverage for the source code. Coverage is verified during the release process using the c8 coverage tool.
 
 
 ## Authors
@@ -136,16 +139,7 @@ Code released under [the ISC license](https://github.com/wernerglinka/metalsmith
 [metalsmith-url]: https://metalsmith.io
 [license-badge]: https://img.shields.io/github/license/wernerglinka/metalsmith-safe-links
 [license-url]: LICENSE
-[coverage-badge]: https://img.shields.io/badge/coverage-97%25-brightgreen
+[coverage-badge]: https://img.shields.io/badge/test%20coverage-97%25-brightgreen
 [coverage-url]: #test-coverage
 [modules-badge]: https://img.shields.io/badge/modules-ESM%2FCJS-blue
-
-## Test Coverage
-
-This plugin maintains high statement and line coverage for the source code. Coverage is verified during the release process using the c8 coverage tool.
-
-File      | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
-----------|---------|----------|---------|---------|-------------------
-All files | 97.16 | 87.5 | 66.66 | 97.16 |
- src | 97.16 | 87.5 | 66.66 | 97.16 | 120-121,140-141
 
