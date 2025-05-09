@@ -89,7 +89,7 @@ const safeLinks = (options = {}) => {
         }
 
         linkCount++;
-        
+
         // Skip handling of special link types
         if (href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:')) {
           debug('Skipping special link: %s', href);

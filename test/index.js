@@ -26,34 +26,34 @@ describe('metalsmith-safe-links (ESM)', () => {
       'Plugin should return a function when called'
     );
   });
-  
+
   // Test with missing hostnames option
   it('should handle missing hostnames option gracefully', (done) => {
     // Create plugin instance with empty options
     const plugin = metalsmithLinks({});
-    
+
     // Should return a function that calls done immediately
     assert.strictEqual(typeof plugin, 'function', 'Should return a function with empty options');
-    
+
     // Call the plugin directly with mock data
     const files = { 'test.html': { contents: Buffer.from('<a href="test">Test</a>') } };
     const metalsmithMock = { debug: () => () => {} };
-    
+
     // Since we're using setImmediate internally, we need to handle it asynchronously
     plugin(files, metalsmithMock, () => {
       done();
     });
   });
-  
+
   // Test with empty files (no HTML files)
   it('should handle no HTML files gracefully', (done) => {
     // Create plugin instance
     const plugin = metalsmithLinks({ hostnames: ['example.com'] });
-    
+
     // Empty files object
     const files = {};
     const metalsmithMock = { debug: () => () => {} };
-    
+
     // Since we're using setImmediate internally, we need to handle it asynchronously
     plugin(files, metalsmithMock, () => {
       // If we got here, the test passed
@@ -100,12 +100,12 @@ describe('metalsmith-safe-links (ESM)', () => {
         done();
       });
   });
-  
+
   // Test handling of various edge cases with links
   it('should handle various link edge cases gracefully', (done) => {
     // Create plugin instance
     const plugin = metalsmithLinks({ hostnames: ['example.com'] });
-    
+
     // Create test files with various link types
     const files = {
       'edge-cases.html': {
@@ -120,62 +120,65 @@ describe('metalsmith-safe-links (ESM)', () => {
 </body></html>`)
       }
     };
-    
+
     // Mock Metalsmith object
     const metalsmithMock = { debug: () => () => {} };
-    
+
     // Call the plugin directly
     plugin(files, metalsmithMock, () => {
       // Verify the content was processed correctly
       const content = files['edge-cases.html'].contents.toString();
-      
+
       // No href should remain unchanged
       assert(content.includes('<a>No href attribute</a>'), 'Should preserve links with no href');
-      
+
       // Empty href should remain unchanged
       assert(content.includes('<a href="">Empty href</a>'), 'Should preserve links with empty href');
-      
+
       // Special link types should remain unchanged
       assert(content.includes('<a href="#anchor">Anchor link</a>'), 'Should preserve anchor links');
       assert(content.includes('<a href="mailto:test@example.com">Email link</a>'), 'Should preserve mailto links');
       assert(content.includes('<a href="tel:+1234567890">Phone link</a>'), 'Should preserve tel links');
-      
+
       // Verify that example.com URL is processed in some way
-      const hasProcessedLink = content.includes('<a href="/path?query=test#fragment">Link with query and fragment</a>') || 
-                              content.includes('<a href="/path">Link with query and fragment</a>');
+      const hasProcessedLink =
+        content.includes('<a href="/path?query=test#fragment">Link with query and fragment</a>') ||
+        content.includes('<a href="/path">Link with query and fragment</a>');
       assert(hasProcessedLink, 'Should process local links with query and fragment');
-      
+
       // Just check that the invalid URL link still exists in some form
       assert(content.includes('Invalid URL'), 'Should preserve invalid URL content');
-      
+
       done();
     });
   });
-  
+
   // Test debug function usage
   it('should use provided debug function', () => {
     // Create a debug function tracker
     let debugCalled = false;
-    const debugFn = () => { debugCalled = true; };
-    
+    const debugFn = () => {
+      debugCalled = true;
+    };
+
     // Mock Metalsmith object with debug function
     const metalsmithMock = {
       debug: () => debugFn
     };
-    
+
     // Create plugin instance
     const plugin = metalsmithLinks({ hostnames: ['example.com'] });
-    
+
     // Create test files
     const files = {
       'debug-test.html': {
         contents: Buffer.from('<a href="https://example.com/test">Test</a>')
       }
     };
-    
+
     // Call the plugin directly
     plugin(files, metalsmithMock, () => {});
-    
+
     // Verify debug function was called
     assert.strictEqual(debugCalled, true, 'Debug function should have been called');
   });

@@ -10,7 +10,6 @@ As markdown syntax only allows for _alt_ and _title_ attributes, content editors
 [![coverage][coverage-badge]][coverage-url]
 [![ESM/CommonJS][modules-badge]][npm-url]
 
-
 ## Installation
 
 ```
@@ -18,6 +17,7 @@ npm i metalsmith-safe-links
 ```
 
 ## Usage
+
 **This plugin must be used after markdown has been transformed into html**
 
 This plugin supports both ESM and CommonJS environments.
@@ -33,9 +33,11 @@ import metalsmithSafeLinks from 'metalsmith-safe-links';
 metalsmith(__dirname)
   .use(markdown())
   .use(layouts())
-  .use(metalsmithSafeLinks({
-    hostnames: ["www.livesite.com", "stagingsite.com"]
-  }))
+  .use(
+    metalsmithSafeLinks({
+      hostnames: ['www.livesite.com', 'stagingsite.com']
+    })
+  )
   .build();
 ```
 
@@ -50,17 +52,17 @@ const metalsmithSafeLinks = require('metalsmith-safe-links');
 metalsmith(__dirname)
   .use(markdown())
   .use(layouts())
-  .use(metalsmithSafeLinks({
-    hostnames: ["www.livesite.com", "stagingsite.com"]
-  }))
+  .use(
+    metalsmithSafeLinks({
+      hostnames: ['www.livesite.com', 'stagingsite.com']
+    })
+  )
   .build();
 ```
 
 ## Options
 
 - **hostNames** [array] - an array of hostnames. The plugin will strip `<protocol://hostname>` from all links with these names.
-
-
 
 ## Example
 
@@ -95,7 +97,7 @@ To log debug output, set the DEBUG environment variable to `metalsmith-safe-link
 Linux/Mac:
 
 ```javascript
-DEBUG=metalsmith-safe-links
+DEBUG = metalsmith - safe - links;
 ```
 
 Windows:
@@ -124,7 +126,6 @@ To use this plugin with the Metalsmith CLI, add `metalsmith-safe-links` to the `
 
 This plugin maintains high statement and line coverage for the source code. Coverage is verified during the release process using the c8 coverage tool.
 
-
 ## Authors
 
 [werner@glinka.co](https://github.com/wernerglinka)
@@ -142,4 +143,3 @@ Code released under [the ISC license](https://github.com/wernerglinka/metalsmith
 [coverage-badge]: https://img.shields.io/badge/test%20coverage-97%25-brightgreen
 [coverage-url]: #test-coverage
 [modules-badge]: https://img.shields.io/badge/modules-ESM%2FCJS-blue
-
