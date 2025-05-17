@@ -125,7 +125,7 @@ To use this plugin with the Metalsmith CLI, add `metalsmith-safe-links` to the `
 
 ## Test Coverage
 
-This plugin maintains high statement and line coverage for the source code. Coverage is verified during the release process using the c8 coverage tool.
+This plugin maintains high statement and line coverage for the source code. Coverage is automatically verified and updated on each push to the main branch using GitHub Actions. The coverage badge at the top of this README reflects the current test coverage.
 
 ## Authors
 
@@ -142,5 +142,5 @@ Code released under [the ISC license](https://github.com/wernerglinka/metalsmith
 [license-badge]: https://img.shields.io/github/license/wernerglinka/metalsmith-safe-links
 [license-url]: LICENSE
 [coverage-badge]: https://img.shields.io/badge/test%20coverage-97%25-brightgreen
-[coverage-url]: #test-coverage
+[coverage-url]: https://github.com/wernerglinka/metalsmith-safe-links/actions/workflows/test.yml
 [modules-badge]: https://img.shields.io/badge/modules-ESM%2FCJS-blue
