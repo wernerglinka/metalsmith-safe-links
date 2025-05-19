@@ -9,7 +9,7 @@ As markdown syntax only allows for _alt_ and _title_ attributes, content editors
 [![license: ISC][license-badge]][license-url]
 [![coverage][coverage-badge]][coverage-url]
 [![ESM/CommonJS][modules-badge]][npm-url]
-[![Known Vulnerabilities](https://snyk.io/test/github/wernerglinka/metalsmith-safe-links/badge.svg)](https://snyk.io/test/github/wernerglinka/metalsmith-safe-links/badge)
+[![Known Vulnerabilities](https://snyk.io/test/npm/metalsmith-safe-links/badge.svg)](https://snyk.io/test/npm/metalsmith-safe-links)
 
 ## Installation
 
