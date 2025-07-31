@@ -93,18 +93,10 @@ will be transformed into
 
 ## Debug
 
-To log debug output, set the DEBUG environment variable to `metalsmith-safe-links`"
-
-Linux/Mac:
+To enable debug logs, set the DEBUG environment variable to metalsmith-safe-links:
 
 ```javascript
-DEBUG = metalsmith - safe - links;
-```
-
-Windows:
-
-```javascript
-set DEBUG=metalsmith-safe-links
+metalsmith.env('DEBUG', '@metalsmith/metadata*');
 ```
 
 ## CLI usage
@@ -122,10 +114,6 @@ To use this plugin with the Metalsmith CLI, add `metalsmith-safe-links` to the `
   ]
 }
 ```
-
-## Test Coverage
-
-This plugin maintains high statement and line coverage for the source code. Coverage is automatically verified and updated on each push to the main branch using GitHub Actions. The coverage badge at the top of this README reflects the current test coverage.
 
 ## Authors
 
