@@ -65,7 +65,7 @@ metalsmith(__dirname)
 
 - **hostNames** [array] - an array of hostnames. The plugin will strip `<protocol://hostname>` from all links with these names.
 
-## Example
+## Examples
 
 An **internal** markdown link
 

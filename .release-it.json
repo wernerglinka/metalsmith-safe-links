@@ -16,7 +16,7 @@
   "github": {
     "release": true,
     "releaseName": "metalsmith-safe-links ${version}",
-    "tokenRef": "GITHUB_TOKEN",
+    "tokenRef": "GH_TOKEN",
     "assets": ["metalsmith-safe-links-${version}.tgz"]
   }
 }
