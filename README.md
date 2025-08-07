@@ -1,8 +1,22 @@
 # metalsmith-safe-links
 
-Metalsmith plugin to strip `<protocol://hostname>` from local links and to add _target_ and _rel_ attributes to external links.
+Metalsmith plugin to process all URLs in HTML documents for sites that need subdirectory deployment support. Strips `<protocol://hostname>` from local URLs across all HTML elements and adds _target_ and _rel_ attributes to external anchor links.
 
-As markdown syntax only allows for _alt_ and _title_ attributes, content editors normally must use HTML to add other link attributes. This plugin negates the use of HTML for links in a markdown document.
+**Processes URLs in all relevant HTML elements:**
+- `<a href>` - Links (also gets target/rel for external)
+- `<link href>` - Stylesheets, favicons, etc.
+- `<script src>` - JavaScript files
+- `<img src>` - Images
+- `<iframe src>` - Embedded frames
+- `<source src>` - Media sources
+- `<track src>` - Video/audio tracks
+- `<embed src>` - Embedded content
+- `<form action>` - Form submission URLs
+- `<object data>` - Object data
+- `<video poster>` - Video posters
+- `<area href>` - Image map areas
+
+This provides a comprehensive solution for sites deployed in subdirectories, handling all URL references in a single place.
 
 [![metalsmith: plugin][metalsmith-badge]][metalsmith-url]
 [![npm: version][npm-badge]][npm-url]
@@ -36,7 +50,8 @@ metalsmith(__dirname)
   .use(layouts())
   .use(
     metalsmithSafeLinks({
-      hostnames: ['www.livesite.com', 'stagingsite.com']
+      hostnames: ['www.livesite.com', 'stagingsite.com'],
+      basePath: 'my-app' // Optional: for sites deployed in subdirectories
     })
   )
   .build();
@@ -55,7 +70,8 @@ metalsmith(__dirname)
   .use(layouts())
   .use(
     metalsmithSafeLinks({
-      hostnames: ['www.livesite.com', 'stagingsite.com']
+      hostnames: ['www.livesite.com', 'stagingsite.com'],
+      basePath: 'my-app' // Optional: for sites deployed in subdirectories
     })
   )
   .build();
@@ -63,33 +79,56 @@ metalsmith(__dirname)
 
 ## Options
 
-- **hostNames** [array] - an array of hostnames. The plugin will strip `<protocol://hostname>` from all links with these names.
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `hostnames` | `array` | `[]` | Array of hostnames considered "local". The plugin will strip `<protocol://hostname>` from all links with these hostnames. |
+| `basePath` | `string` | `''` | Base path to prepend to local links (e.g., `'my-app'` for sites deployed at `/my-app/`). |
 
 ## Examples
 
-An **internal** markdown link
+### Basic Usage (without basePath)
 
-```
-[Go to this page](https://www.livesite.com/this-page/)
-```
+**Anchor links:**
+```html
+<!-- Input -->
+<a href="https://www.livesite.com/page/">Internal Link</a>
+<a href="https://external.com/">External Link</a>
 
-will be transformed into
-
-```
-<a href="/this-page/">Go to this page</a>
-```
-
-An **external** markdown link
-
-```
-[Go to this site](https://www.externalsite.com/)
+<!-- Output -->
+<a href="/page/">Internal Link</a>
+<a href="https://external.com/" target="_blank" rel="noopener noreferrer">External Link</a>
 ```
 
-will be transformed into
+**All other elements (stylesheets, scripts, images, etc.):**
+```html
+<!-- Input -->
+<link href="https://www.livesite.com/styles.css" rel="stylesheet">
+<script src="https://www.livesite.com/app.js"></script>
+<img src="https://www.livesite.com/image.jpg" alt="Image">
 
+<!-- Output -->
+<link href="/styles.css" rel="stylesheet">
+<script src="/app.js"></script>
+<img src="/image.jpg" alt="Image">
 ```
-<a href="https://www.externalsite.com/" target="_blank" rel="noopener noreferrer">Go to this site</a>
+
+### With Base Path
+
+When using `basePath: 'my-app'`, **all local URLs** are transformed:
+
+```html
+<!-- Input -->
+<link href="https://www.livesite.com/styles.css" rel="stylesheet">
+<a href="https://www.livesite.com/page/">Internal Link</a>
+<img src="https://www.livesite.com/image.jpg" alt="Image">
+
+<!-- Output -->
+<link href="/my-app/styles.css" rel="stylesheet">
+<a href="/my-app/page/">Internal Link</a>  
+<img src="/my-app/image.jpg" alt="Image">
 ```
+
+This enables sites deployed in subdirectories like `https://example.com/my-app/` to work correctly with all assets and links.
 
 ## Debug
 
@@ -108,7 +147,8 @@ To use this plugin with the Metalsmith CLI, add `metalsmith-safe-links` to the `
   "plugins": [
     {
       "metalsmith-safe-links": {
-        "hostnames": ["www.livesite.com", "stagingsite.com"]
+        "hostnames": ["www.livesite.com", "stagingsite.com"],
+        "basePath": "my-app"
       }
     }
   ]
