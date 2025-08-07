@@ -326,8 +326,8 @@ describe('metalsmith-safe-links (ESM)', () => {
     });
   });
 
-  it('should handle relative URLs without modification', (done) => {
-    // Create plugin instance
+  it('should handle relative URLs with base path prepending', (done) => {
+    // Create plugin instance with base path
     const plugin = metalsmithLinks({ 
       hostnames: ['example.com'],
       basePath: 'app'
@@ -337,10 +337,12 @@ describe('metalsmith-safe-links (ESM)', () => {
     const files = {
       'relative-urls-test.html': {
         contents: Buffer.from(`<html><body>
-<a href="/relative-link">Relative Link</a>
-<img src="./local-image.jpg" alt="Local Image">
-<link href="../styles.css" rel="stylesheet">
-<script src="js/script.js"></script>
+<a href="/relative-link">Root-relative Link</a>
+<img src="/images/photo.jpg" alt="Root-relative Image">
+<link href="/css/styles.css" rel="stylesheet">
+<script src="/js/script.js"></script>
+<img src="./local-image.jpg" alt="Path-relative Image">
+<a href="../parent-page">Parent-relative Link</a>
 </body></html>`)
       }
     };
@@ -352,11 +354,47 @@ describe('metalsmith-safe-links (ESM)', () => {
     plugin(files, metalsmithMock, () => {
       const content = files['relative-urls-test.html'].contents.toString();
       
-      // Verify relative URLs are unchanged (no protocol/hostname to process)
-      assert(content.includes('href="/relative-link"'), 'Relative link should be unchanged');
-      assert(content.includes('src="./local-image.jpg"'), 'Relative image should be unchanged');
-      assert(content.includes('href="../styles.css"'), 'Relative stylesheet should be unchanged');
-      assert(content.includes('src="js/script.js"'), 'Relative script should be unchanged');
+      // Verify root-relative URLs (starting with /) get base path prepended
+      assert(content.includes('href="/app/relative-link"'), 'Root-relative link should get base path');
+      assert(content.includes('src="/app/images/photo.jpg"'), 'Root-relative image should get base path');
+      assert(content.includes('href="/app/css/styles.css"'), 'Root-relative stylesheet should get base path');
+      assert(content.includes('src="/app/js/script.js"'), 'Root-relative script should get base path');
+      
+      // Verify path-relative URLs (./  ../) remain unchanged
+      assert(content.includes('src="./local-image.jpg"'), 'Path-relative image should be unchanged');
+      assert(content.includes('href="../parent-page"'), 'Parent-relative link should be unchanged');
+        
+      done();
+    });
+  });
+
+  it('should handle relative URLs without basePath', (done) => {
+    // Create plugin instance without base path
+    const plugin = metalsmithLinks({ 
+      hostnames: ['example.com']
+      // No basePath
+    });
+
+    // Create test files with relative URLs
+    const files = {
+      'no-basepath-relative-test.html': {
+        contents: Buffer.from(`<html><body>
+<a href="/page">Root-relative Link</a>
+<img src="/image.jpg" alt="Root-relative Image">
+</body></html>`)
+      }
+    };
+
+    // Mock Metalsmith object
+    const metalsmithMock = { debug: () => () => {} };
+
+    // Call the plugin directly
+    plugin(files, metalsmithMock, () => {
+      const content = files['no-basepath-relative-test.html'].contents.toString();
+      
+      // Verify relative URLs remain unchanged when no basePath
+      assert(content.includes('href="/page"'), 'Root-relative link should be unchanged without basePath');
+      assert(content.includes('src="/image.jpg"'), 'Root-relative image should be unchanged without basePath');
         
       done();
     });
