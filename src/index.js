@@ -102,7 +102,7 @@ const processUrlElement = ( { element, attr, url, isAnchor, hostnames, opts, deb
  * 4. Supports subdirectory deployments by processing both absolute and relative URLs
  * 
  * Processes URLs in: <a href>, <link href>, <script src>, <img src>, <iframe src>,
- * <source src>, <embed src>, <track src>, <form action>, <object data>, <video poster>, <area href>
+ * <source src>, <embed src>, <track src>, <form action>, <object data>, <video poster>, <area href>, <meta content>
  *
  * @param {Object} options - Plugin options
  * @param {string[]} options.hostnames - Array of hostnames considered "local"
@@ -176,7 +176,8 @@ const safeLinks = ( options = {} ) => {
         { selector: 'track[src]', attr: 'src', isAnchor: false },
         { selector: 'form[action]', attr: 'action', isAnchor: false },
         { selector: 'object[data]', attr: 'data', isAnchor: false },
-        { selector: 'video[poster]', attr: 'poster', isAnchor: false }
+        { selector: 'video[poster]', attr: 'poster', isAnchor: false },
+        { selector: 'meta[content]', attr: 'content', isAnchor: false }
       ];
 
       // Process each selector type

@@ -277,6 +277,8 @@ describe('metalsmith-safe-links (ESM)', () => {
         contents: Buffer.from(`<html><head>
 <link href="https://example.com/styles.css" rel="stylesheet">
 <script src="https://example.com/script.js"></script>
+<meta property="og:image" content="https://example.com/social.jpg">
+<meta name="twitter:image" content="https://example.com/twitter.jpg">
 </head><body>
 <a href="https://example.com/page/">Link</a>
 <img src="https://example.com/image.jpg" alt="Image">
@@ -305,6 +307,8 @@ describe('metalsmith-safe-links (ESM)', () => {
       // Verify local URLs have base path prepended
       assert(content.includes('href="/app/styles.css"'), 'Link element should have base path');
       assert(content.includes('src="/app/script.js"'), 'Script element should have base path');
+      assert(content.includes('content="/app/social.jpg"'), 'Meta og:image should have base path');
+      assert(content.includes('content="/app/twitter.jpg"'), 'Meta twitter:image should have base path');
       assert(content.includes('href="/app/page/"'), 'Anchor element should have base path');
       assert(content.includes('src="/app/image.jpg"'), 'Image element should have base path');
       assert(content.includes('src="/app/iframe.html"'), 'Iframe element should have base path');
@@ -336,11 +340,14 @@ describe('metalsmith-safe-links (ESM)', () => {
     // Create test files with relative URLs
     const files = {
       'relative-urls-test.html': {
-        contents: Buffer.from(`<html><body>
-<a href="/relative-link">Root-relative Link</a>
-<img src="/images/photo.jpg" alt="Root-relative Image">
+        contents: Buffer.from(`<html><head>
+<meta property="og:image" content="/images/social.jpg">
+<meta name="twitter:image" content="/images/twitter.jpg">
 <link href="/css/styles.css" rel="stylesheet">
 <script src="/js/script.js"></script>
+</head><body>
+<a href="/relative-link">Root-relative Link</a>
+<img src="/images/photo.jpg" alt="Root-relative Image">
 <img src="./local-image.jpg" alt="Path-relative Image">
 <a href="../parent-page">Parent-relative Link</a>
 </body></html>`)
@@ -355,10 +362,12 @@ describe('metalsmith-safe-links (ESM)', () => {
       const content = files['relative-urls-test.html'].contents.toString();
       
       // Verify root-relative URLs (starting with /) get base path prepended
-      assert(content.includes('href="/app/relative-link"'), 'Root-relative link should get base path');
-      assert(content.includes('src="/app/images/photo.jpg"'), 'Root-relative image should get base path');
+      assert(content.includes('content="/app/images/social.jpg"'), 'Meta og:image should get base path');
+      assert(content.includes('content="/app/images/twitter.jpg"'), 'Meta twitter:image should get base path');
       assert(content.includes('href="/app/css/styles.css"'), 'Root-relative stylesheet should get base path');
       assert(content.includes('src="/app/js/script.js"'), 'Root-relative script should get base path');
+      assert(content.includes('href="/app/relative-link"'), 'Root-relative link should get base path');
+      assert(content.includes('src="/app/images/photo.jpg"'), 'Root-relative image should get base path');
       
       // Verify path-relative URLs (./  ../) remain unchanged
       assert(content.includes('src="./local-image.jpg"'), 'Path-relative image should be unchanged');
