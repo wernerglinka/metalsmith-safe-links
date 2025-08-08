@@ -2,6 +2,7 @@ import * as cheerio from 'cheerio';
 import { extname } from 'path';
 import { urlSelectors } from '../config/selectors.js';
 import { processUrlElement } from './url-processor.js';
+import { processElementStyle } from './style-processor.js';
 
 /**
  * Check if a file is an HTML file
@@ -32,6 +33,9 @@ export const processHTMLFile = ( file, fileData, { hostnames, opts, debug } ) =>
   let linkCount = 0;
   let localLinkCount = 0;
   let externalLinkCount = 0;
+  let styleCount = 0;
+  let localStyleCount = 0;
+  let externalStyleCount = 0;
 
   // Process each selector type
   urlSelectors.forEach( ( { selector, attr, isAnchor } ) => {
@@ -53,11 +57,30 @@ export const processHTMLFile = ( file, fileData, { hostnames, opts, debug } ) =>
     } );
   } );
 
+  // Process inline styles on all elements with style attributes
+  $( '[style]' ).each( function() {
+    const element = $( this );
+    const { localCount, externalCount, processed } = processElementStyle( { element, hostnames, opts, debug } );
+    
+    if ( processed ) {
+      styleCount++;
+      localStyleCount += localCount;
+      externalStyleCount += externalCount;
+    }
+  } );
+
   // Save statistics
-  debug( `File ${ file }: processed ${ linkCount } links (${ localLinkCount } local, ${ externalLinkCount } external)` );
+  debug( `File ${ file }: processed ${ linkCount } links (${ localLinkCount } local, ${ externalLinkCount } external), ${ styleCount } inline styles (${ localStyleCount } local, ${ externalStyleCount } external)` );
 
   // Update file contents
   fileData.contents = Buffer.from( $.html() );
 
-  return { linkCount, localLinkCount, externalLinkCount };
+  return { 
+    linkCount, 
+    localLinkCount, 
+    externalLinkCount,
+    styleCount,
+    localStyleCount,
+    externalStyleCount
+  };
 };
