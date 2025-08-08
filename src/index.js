@@ -1,8 +1,6 @@
 'use strict';
 
-import * as cheerio from 'cheerio';
-import { extname } from 'path';
-import { parse as parseUrl } from 'url';
+import { isHTMLFile, processHTMLFile } from './processors/file-processor.js';
 
 /**
  * Debug namespace
@@ -11,25 +9,25 @@ import { parse as parseUrl } from 'url';
 const DEBUG_NAMESPACE = 'metalsmith-safe-links';
 
 /**
- * Check if a file is an HTML file
- * @param {string} filePath - Path to check
- * @returns {boolean} True if file is HTML
- */
-const isHTMLFile = ( filePath ) => /\.html$|\.htm$/i.test( extname( filePath ) );
-
-/**
- * Metalsmith plugin to process all site links:
- * 1. Strips protocol and hostname from links to local sites
- * 2. Adds target="_blank" and rel="noopener noreferrer" to external links
+ * Metalsmith plugin to process all site URLs across HTML elements:
+ * 1. Strips protocol and hostname from URLs to local sites (all elements)
+ * 2. Prepends base path to relative URLs starting with / (all elements)
+ * 3. Adds target="_blank" and rel="noopener noreferrer" to external anchor links
+ * 4. Supports subdirectory deployments by processing both absolute and relative URLs
+ * 
+ * Processes URLs in: <a href>, <link href>, <script src>, <img src>, <iframe src>,
+ * <source src>, <embed src>, <track src>, <form action>, <object data>, <video poster>, <area href>, <meta content>
  *
  * @param {Object} options - Plugin options
  * @param {string[]} options.hostnames - Array of hostnames considered "local"
+ * @param {string} options.basePath - Base path for the site (e.g., "base-path" for sites deployed in subdirectories)
  * @returns {Function} Metalsmith plugin function
  */
 const safeLinks = ( options = {} ) => {
   // Set default options
   const opts = {
     hostnames: [],
+    basePath: '',
     ...options
   };
 
@@ -67,65 +65,7 @@ const safeLinks = ( options = {} ) => {
 
     // Process each HTML file
     htmlFiles.forEach( ( file ) => {
-      const contents = files[ file ].contents.toString();
-
-      // Load content into cheerio
-      const $ = cheerio.load( contents, {
-        decodeEntities: false
-      } );
-
-      // Process all links
-      let linkCount = 0;
-      let localLinkCount = 0;
-      let externalLinkCount = 0;
-
-      $( 'a' ).each( function() {
-        const thisLink = $( this );
-        const linkAttributes = thisLink[ 0 ].attribs;
-        const href = linkAttributes.href;
-
-        if ( !href || typeof href !== 'string' ) {
-          return;
-        }
-
-        linkCount++;
-
-        // Skip handling of special link types
-        if ( href.startsWith( '#' ) || href.startsWith( 'mailto:' ) || href.startsWith( 'tel:' ) ) {
-          debug( 'Skipping special link: %s', href );
-          return;
-        }
-
-        // Parse URL
-        try {
-          const urlData = parseUrl( href, true );
-
-          // Only process links with protocol and hostname
-          if ( urlData.protocol && urlData.hostname ) {
-            // Check if hostname is in our "local" list
-            if ( hostnames.has( urlData.hostname ) ) {
-              // Strip protocol and hostname from local link
-              localLinkCount++;
-              debug( 'Converting local link: %s to %s', href, urlData.pathname );
-              thisLink.attr( 'href', urlData.pathname );
-            } else {
-              // Add target and rel to external link
-              externalLinkCount++;
-              debug( 'Adding target and rel to external link: %s', href );
-              thisLink.attr( 'target', '_blank' );
-              thisLink.attr( 'rel', 'noopener noreferrer' );
-            }
-          }
-        } catch ( err ) {
-          debug( 'Error parsing URL %s: %s', href, err.message );
-        }
-      } );
-
-      // Save statistics
-      debug( `File ${ file }: processed ${ linkCount } links (${ localLinkCount } local, ${ externalLinkCount } external)` );
-
-      // Update file contents
-      files[ file ].contents = Buffer.from( $.html() );
+      processHTMLFile( file, files[ file ], { hostnames, opts, debug } );
     } );
 
     setImmediate( done );
