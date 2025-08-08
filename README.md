@@ -1,6 +1,6 @@
 # metalsmith-safe-links
 
-Metalsmith plugin to process all URLs in HTML documents for sites that need subdirectory deployment support. Handles both absolute and relative URLs across all HTML elements.
+Metalsmith plugin to process all URLs in HTML documents for sites that need subdirectory deployment support. Handles both absolute and relative URLs across all HTML elements and inline CSS styles.
 
 **URL Processing:**
 - **Absolute URLs with matching hostnames** → Strips `<protocol://hostname>`, adds base path
@@ -21,6 +21,7 @@ Metalsmith plugin to process all URLs in HTML documents for sites that need subd
 - `<object data>` - Object data
 - `<video poster>` - Video posters
 - `<area href>` - Image map areas
+- `style` attributes - CSS `url()` functions (e.g., `background-image: url(...)`)
 
 This provides a comprehensive solution for sites deployed in subdirectories, handling all URL references in a single place regardless of whether they're absolute or relative.
 
@@ -134,6 +135,31 @@ When using `basePath: 'my-app'`, **all applicable URLs** are transformed:
 <a href="/my-app/about/">Root-relative Link</a>
 <script src="./local.js"></script>  <!-- Path-relative unchanged -->
 ```
+
+### CSS url() Processing
+
+The plugin also processes URLs within CSS `url()` functions in `style` attributes:
+
+```html
+<!-- Input -->
+<div style="background-image: url('https://www.livesite.com/bg.jpg')">Local background</div>
+<div style="background-image: url('https://external.com/bg.jpg')">External background</div>
+<div style="background-image: url('/relative/image.jpg')">Root-relative background</div>
+<p style="background: url(https://www.livesite.com/icon.png) no-repeat; color: red;">Complex styles</p>
+
+<!-- Output (with basePath: 'my-app') -->
+<div style="background-image: url('/my-app/bg.jpg')">Local background</div>
+<div style="background-image: url('https://external.com/bg.jpg')">External background</div>
+<div style="background-image: url('/my-app/relative/image.jpg')">Root-relative background</div>
+<p style="background: url(/my-app/icon.png) no-repeat; color: red;">Complex styles</p>
+```
+
+**CSS Processing Features:**
+- Handles single quotes, double quotes, and unquoted URLs
+- Preserves original formatting and spacing
+- Processes multiple `url()` functions within complex styles
+- Skips data URLs and hash references (e.g., `#pattern`)
+- Works with any CSS property using `url()` (background-image, border-image, etc.)
 
 **Key behaviors:**
 - **Absolute URLs** with matching hostnames → stripped and get base path

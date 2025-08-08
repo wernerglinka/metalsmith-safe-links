@@ -9,14 +9,15 @@ import { isHTMLFile, processHTMLFile } from './processors/file-processor.js';
 const DEBUG_NAMESPACE = 'metalsmith-safe-links';
 
 /**
- * Metalsmith plugin to process all site URLs across HTML elements:
- * 1. Strips protocol and hostname from URLs to local sites (all elements)
- * 2. Prepends base path to relative URLs starting with / (all elements)
+ * Metalsmith plugin to process all site URLs across HTML elements and inline styles:
+ * 1. Strips protocol and hostname from URLs to local sites (all elements and CSS url() functions)
+ * 2. Prepends base path to relative URLs starting with / (all elements and CSS url() functions)
  * 3. Adds target="_blank" and rel="noopener noreferrer" to external anchor links
  * 4. Supports subdirectory deployments by processing both absolute and relative URLs
  * 
  * Processes URLs in: <a href>, <link href>, <script src>, <img src>, <iframe src>,
  * <source src>, <embed src>, <track src>, <form action>, <object data>, <video poster>, <area href>, <meta content>
+ * Also processes CSS url() functions in style attributes: background-image: url(...), etc.
  *
  * @param {Object} options - Plugin options
  * @param {string[]} options.hostnames - Array of hostnames considered "local"

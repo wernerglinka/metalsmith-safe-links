@@ -409,6 +409,115 @@ describe('metalsmith-safe-links (ESM)', () => {
     });
   });
 
+  // Test inline style URL processing
+  it('should process URLs in inline styles', (done) => {
+    const metal = metalsmith(fixture());
+
+    metal
+      .use(
+        metalsmithLinks({
+          hostnames: ['www.potatohead.com']
+        })
+      )
+      .build((err) => {
+        if (err) {
+          return done(err);
+        }
+
+        assert.strictEqual(file('build/inline-styles.html'), file('expected/inline-styles.html'));
+
+        done();
+      });
+  });
+
+  it('should handle inline styles with base path correctly', (done) => {
+    // Create plugin instance with base path
+    const plugin = metalsmithLinks({ 
+      hostnames: ['example.com'],
+      basePath: 'assets'
+    });
+
+    // Create test files with inline styles
+    const files = {
+      'inline-styles-basepath.html': {
+        contents: Buffer.from(`<html><body>
+<div style="background-image: url('https://example.com/images/bg.jpg')">Local background</div>
+<div style="background-image: url('https://external.com/images/bg.jpg')">External background</div>
+<div style="background-image: url('/icons/icon.png')">Root-relative background</div>
+<p style="background: url(https://example.com/icons/icon.svg) no-repeat; color: red;">Multiple styles</p>
+<div style="background-image: url('data:image/png;base64,abc123')">Data URL</div>
+<div style="background-image: url('#pattern')">Hash URL</div>
+</body></html>`)
+      }
+    };
+
+    // Mock Metalsmith object
+    const metalsmithMock = { debug: () => () => {} };
+
+    // Call the plugin directly
+    plugin(files, metalsmithMock, () => {
+      const content = files['inline-styles-basepath.html'].contents.toString();
+      
+      // Verify local URLs have base path prepended
+      assert(content.includes("background-image: url('/assets/images/bg.jpg')"), 
+        'Local style URL should have base path');
+      assert(content.includes("background: url(/assets/icons/icon.svg) no-repeat"), 
+        'Local style URL in complex background should have base path');
+      assert(content.includes("background-image: url('/assets/icons/icon.png')"), 
+        'Root-relative style URL should have base path');
+      
+      // Verify external URLs remain unchanged
+      assert(content.includes("background-image: url('https://external.com/images/bg.jpg')"), 
+        'External style URL should remain unchanged');
+      
+      // Verify special URLs are preserved
+      assert(content.includes("url('data:image/png;base64,abc123')"), 
+        'Data URL should be preserved');
+      assert(content.includes("url('#pattern')"), 
+        'Hash URL should be preserved');
+        
+      done();
+    });
+  });
+
+  it('should handle various CSS url() formats in styles', (done) => {
+    // Create plugin instance
+    const plugin = metalsmithLinks({ 
+      hostnames: ['mysite.com'],
+      basePath: 'cdn'
+    });
+
+    // Create test files with various CSS url formats
+    const files = {
+      'css-formats.html': {
+        contents: Buffer.from(`<html><body>
+<div style="background-image: url('https://mysite.com/bg1.jpg')">Single quotes</div>
+<div style='background-image: url("https://mysite.com/bg2.jpg")'>Double quotes</div>
+<div style="background-image: url(https://mysite.com/bg3.jpg)">No quotes</div>
+<div style="background: url( 'https://mysite.com/bg4.jpg' ) repeat-x">Spaces</div>
+<div style="background: linear-gradient(to bottom, url('https://mysite.com/gradient.png'), #000)">Gradient</div>
+</body></html>`)
+      }
+    };
+
+    // Mock Metalsmith object
+    const metalsmithMock = { debug: () => () => {} };
+
+    // Call the plugin directly
+    plugin(files, metalsmithMock, () => {
+      const content = files['css-formats.html'].contents.toString();
+      
+      // Verify all formats are processed correctly
+      assert(content.includes("url('/cdn/bg1.jpg')"), 'Single quotes format should work');
+      assert(content.includes('url(&quot;/cdn/bg2.jpg&quot;)'), 'Double quotes format should work');
+      assert(content.includes("url(/cdn/bg3.jpg)"), 'No quotes format should work');
+      assert(content.includes("url( '/cdn/bg4.jpg' )"), 'Spaces format should work');
+      assert(content.includes("url('/cdn/gradient.png')"), 'Complex gradient format should work');
+        
+      done();
+    });
+  });
+
   // Test debug function usage
   it('should use provided debug function', () => {
     // Create a debug function tracker
