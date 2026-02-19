@@ -22,6 +22,19 @@ export const isHTMLFile = ( filePath ) => /\.html$|\.htm$/i.test( extname( fileP
  * @returns {Object} Processing statistics
  */
 export const processHTMLFile = ( file, fileData, { hostnames, opts, debug } ) => {
+  // Validate file contents before processing
+  if ( !fileData.contents || !Buffer.isBuffer( fileData.contents ) ) {
+    debug( `Skipping ${file}: invalid or missing file contents` );
+    return {
+      linkCount: 0,
+      localLinkCount: 0,
+      externalLinkCount: 0,
+      styleCount: 0,
+      localStyleCount: 0,
+      externalStyleCount: 0
+    };
+  }
+
   const contents = fileData.contents.toString();
 
   // Load content into cheerio

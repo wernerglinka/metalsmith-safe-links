@@ -2,21 +2,19 @@
   "hooks": {
     "before:init": ["npm run lint", "npm test"],
     "after:bump": "npx auto-changelog -p --commit-limit false --ignore-commit-pattern '^((dev|chore|ci):|Release)'",
-    "after:npm:bump": "npm pack && ls *.tgz",
     "after:release": "echo Successfully released ${name} v${version} to ${repo.repository}."
   },
   "git": {
     "commitMessage": "Release ${version}",
-    "commitArgs": ["-S"],
-    "tagAnnotation": "Release ${version}",
-    "tagArgs": ["-s"],
-    "changelog": "npx auto-changelog -u --commit-limit false --ignore-commit-pattern '^((dev|chore|ci):|Release)' --stdout -t https://raw.githubusercontent.com/release-it/release-it/master/templates/changelog-compact.hbs"
+    "tagAnnotation": "Release ${version}"
   },
-  "npm": { "publish": false },
+  "npm": {
+    "publish": false
+  },
   "github": {
     "release": true,
     "releaseName": "metalsmith-safe-links ${version}",
     "tokenRef": "GH_TOKEN",
-    "assets": ["metalsmith-safe-links-${version}.tgz"]
+    "autoGenerate": true
   }
 }

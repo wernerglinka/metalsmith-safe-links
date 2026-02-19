@@ -64,19 +64,25 @@ const safeLinks = ( options = {} ) => {
 
     debug( `Processing ${ htmlFiles.length } HTML files` );
 
-    // Process each HTML file
-    htmlFiles.forEach( ( file ) => {
-      processHTMLFile( file, files[ file ], { hostnames, opts, debug } );
-    } );
+    try {
+      // Process each HTML file
+      htmlFiles.forEach( ( file ) => {
+        processHTMLFile( file, files[ file ], { hostnames, opts, debug } );
+      } );
 
-    setImmediate( done );
+      debug( 'Completed processing all HTML files' );
+      done();
+    } catch ( error ) {
+      debug( 'Error processing files: %s', error.message );
+      done( error );
+    }
   };
 };
 
+// Set function name for better debugging
+Object.defineProperty( safeLinks, 'name', {
+  value: 'metalsmith-safe-links'
+} );
+
 // ESM export
 export default safeLinks;
-
-// CommonJS export compatibility (will be transformed by microbundle)
-if ( typeof module !== 'undefined' ) {
-  module.exports = safeLinks;
-}
