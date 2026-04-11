@@ -30,7 +30,7 @@
     "lint": "eslint --fix .",
     "lint:check": "eslint --fix-dry-run .",
     "format-and-lint": "npm run format && npm run lint",
-    "prepublishOnly": "npm run build",
+    "prepare": "npm run build",
     "release:check": "npm run lint:check && npm run build && release-it --dry-run",
     "release:patch": "./scripts/release.sh patch --ci",
     "release:minor": "./scripts/release.sh minor --ci",
