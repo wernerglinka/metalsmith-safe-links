@@ -29,7 +29,9 @@ This provides a comprehensive solution for sites deployed in subdirectories, han
 [![npm: version][npm-badge]][npm-url]
 [![license: ISC][license-badge]][license-url]
 [![coverage][coverage-badge]][coverage-url]
-[![ESM/CommonJS][modules-badge]][npm-url]
+[![ESM][modules-badge]][npm-url]
+
+This package is **ESM-only** and requires Node >= 22. CommonJS projects on Node 22 can still consume it with `require('metalsmith-safe-links')` thanks to Node's `require(esm)` support.
 
 ## Installation
 
@@ -41,37 +43,13 @@ npm i metalsmith-safe-links
 
 **This plugin must be used after markdown has been transformed into html**
 
-This plugin supports both ESM and CommonJS environments.
-
-### ESM (ECMAScript Modules)
-
 ```js
-import metalsmith from 'metalsmith';
+import Metalsmith from 'metalsmith';
 import markdown from '@metalsmith/markdown';
 import layouts from '@metalsmith/layouts';
 import metalsmithSafeLinks from 'metalsmith-safe-links';
 
-metalsmith(__dirname)
-  .use(markdown())
-  .use(layouts())
-  .use(
-    metalsmithSafeLinks({
-      hostnames: ['www.livesite.com', 'stagingsite.com'],
-      basePath: 'my-app' // Optional: for sites deployed in subdirectories
-    })
-  )
-  .build();
-```
-
-### CommonJS
-
-```js
-const metalsmith = require('metalsmith');
-const markdown = require('@metalsmith/markdown');
-const layouts = require('@metalsmith/layouts');
-const metalsmithSafeLinks = require('metalsmith-safe-links');
-
-metalsmith(__dirname)
+Metalsmith(import.meta.dirname)
   .use(markdown())
   .use(layouts())
   .use(
@@ -172,7 +150,7 @@ This enables sites deployed in subdirectories like `https://example.com/my-app/`
 To enable debug logs, set the DEBUG environment variable to metalsmith-safe-links:
 
 ```javascript
-metalsmith.env('DEBUG', '@metalsmith/metadata*');
+metalsmith.env('DEBUG', 'metalsmith-safe-links*');
 ```
 
 ## CLI usage
@@ -208,4 +186,4 @@ Code released under [the ISC license](https://github.com/wernerglinka/metalsmith
 [license-url]: LICENSE
 [coverage-badge]: https://img.shields.io/badge/test%20coverage-94%25-brightgreen
 [coverage-url]: https://github.com/wernerglinka/metalsmith-safe-links/actions/workflows/test.yml
-[modules-badge]: https://img.shields.io/badge/modules-ESM%2FCJS-blue
+[modules-badge]: https://img.shields.io/badge/module-ESM-blue

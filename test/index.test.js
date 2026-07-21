@@ -1,7 +1,6 @@
-'use strict';
-
+import { describe, it } from 'node:test';
 import { strict as assert } from 'node:assert';
-import metalsmith from 'metalsmith';
+import Metalsmith from 'metalsmith';
 import metalsmithLinks from '../src/index.js';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -28,7 +27,7 @@ describe('metalsmith-safe-links (ESM)', () => {
   });
 
   // Test with missing hostnames option
-  it('should handle missing hostnames option gracefully', (done) => {
+  it('should handle missing hostnames option gracefully', (_t, done) => {
     // Create plugin instance with empty options
     const plugin = metalsmithLinks({});
 
@@ -37,32 +36,32 @@ describe('metalsmith-safe-links (ESM)', () => {
 
     // Call the plugin directly with mock data
     const files = { 'test.html': { contents: Buffer.from('<a href="test">Test</a>') } };
-    const metalsmithMock = { debug: () => () => {} };
+    const ms = Metalsmith(fixture());
 
     // Since we're using setImmediate internally, we need to handle it asynchronously
-    plugin(files, metalsmithMock, () => {
+    plugin(files, ms, () => {
       done();
     });
   });
 
   // Test with empty files (no HTML files)
-  it('should handle no HTML files gracefully', (done) => {
+  it('should handle no HTML files gracefully', (_t, done) => {
     // Create plugin instance
     const plugin = metalsmithLinks({ hostnames: ['example.com'] });
 
     // Empty files object
     const files = {};
-    const metalsmithMock = { debug: () => () => {} };
+    const ms = Metalsmith(fixture());
 
     // Since we're using setImmediate internally, we need to handle it asynchronously
-    plugin(files, metalsmithMock, () => {
+    plugin(files, ms, () => {
       // If we got here, the test passed
       done();
     });
   });
 
-  it('should strip host name from local links href', (done) => {
-    const metal = metalsmith(fixture());
+  it('should strip host name from local links href', (_t, done) => {
+    const metal = Metalsmith(fixture());
 
     metal
       .use(
@@ -81,8 +80,8 @@ describe('metalsmith-safe-links (ESM)', () => {
       });
   });
 
-  it('should add target and rel attributes to external links', (done) => {
-    const metal = metalsmith(fixture());
+  it('should add target and rel attributes to external links', (_t, done) => {
+    const metal = Metalsmith(fixture());
 
     metal
       .use(
@@ -102,7 +101,7 @@ describe('metalsmith-safe-links (ESM)', () => {
   });
 
   // Test handling of various edge cases with links
-  it('should handle various link edge cases gracefully', (done) => {
+  it('should handle various link edge cases gracefully', (_t, done) => {
     // Create plugin instance
     const plugin = metalsmithLinks({ hostnames: ['example.com'] });
 
@@ -122,10 +121,10 @@ describe('metalsmith-safe-links (ESM)', () => {
     };
 
     // Mock Metalsmith object
-    const metalsmithMock = { debug: () => () => {} };
+    const ms = Metalsmith(fixture());
 
     // Call the plugin directly
-    plugin(files, metalsmithMock, () => {
+    plugin(files, ms, () => {
       // Verify the content was processed correctly
       const content = files['edge-cases.html'].contents.toString();
 
@@ -154,9 +153,9 @@ describe('metalsmith-safe-links (ESM)', () => {
   });
 
   // Test base path functionality
-  it('should prepend base path to local links when basePath is provided', (done) => {
+  it('should prepend base path to local links when basePath is provided', (_t, done) => {
     // Create plugin instance with base path
-    const plugin = metalsmithLinks({ 
+    const plugin = metalsmithLinks({
       hostnames: ['example.com'],
       basePath: 'my-app'
     });
@@ -172,28 +171,29 @@ describe('metalsmith-safe-links (ESM)', () => {
     };
 
     // Mock Metalsmith object
-    const metalsmithMock = { debug: () => () => {} };
+    const ms = Metalsmith(fixture());
 
     // Call the plugin directly
-    plugin(files, metalsmithMock, () => {
+    plugin(files, ms, () => {
       // Verify the content was processed correctly
       const content = files['basepath-test.html'].contents.toString();
-      
+
       // Local link should have base path prepended
-      assert(content.includes('<a href="/my-app/page/">Local link</a>'), 
-        'Local link should have base path prepended');
-      
+      assert(content.includes('<a href="/my-app/page/">Local link</a>'), 'Local link should have base path prepended');
+
       // External link should have target and rel attributes
-      assert(content.includes('target="_blank"') && content.includes('rel="noopener noreferrer"'), 
-        'External link should have target and rel attributes');
-        
+      assert(
+        content.includes('target="_blank"') && content.includes('rel="noopener noreferrer"'),
+        'External link should have target and rel attributes'
+      );
+
       done();
     });
   });
 
-  it('should work normally when basePath is empty string', (done) => {
+  it('should work normally when basePath is empty string', (_t, done) => {
     // Create plugin instance with empty base path
-    const plugin = metalsmithLinks({ 
+    const plugin = metalsmithLinks({
       hostnames: ['example.com'],
       basePath: ''
     });
@@ -208,24 +208,26 @@ describe('metalsmith-safe-links (ESM)', () => {
     };
 
     // Mock Metalsmith object
-    const metalsmithMock = { debug: () => () => {} };
+    const ms = Metalsmith(fixture());
 
     // Call the plugin directly
-    plugin(files, metalsmithMock, () => {
+    plugin(files, ms, () => {
       // Verify the content was processed correctly
       const content = files['no-basepath-test.html'].contents.toString();
-      
+
       // Local link should not have base path prepended
-      assert(content.includes('<a href="/page/">Local link</a>'), 
-        'Local link should not have base path when basePath is empty');
-        
+      assert(
+        content.includes('<a href="/page/">Local link</a>'),
+        'Local link should not have base path when basePath is empty'
+      );
+
       done();
     });
   });
 
-  it('should handle complex paths with base path correctly', (done) => {
+  it('should handle complex paths with base path correctly', (_t, done) => {
     // Create plugin instance with base path
-    const plugin = metalsmithLinks({ 
+    const plugin = metalsmithLinks({
       hostnames: ['mysite.com'],
       basePath: 'sub/directory'
     });
@@ -243,30 +245,35 @@ describe('metalsmith-safe-links (ESM)', () => {
     };
 
     // Mock Metalsmith object
-    const metalsmithMock = { debug: () => () => {} };
+    const ms = Metalsmith(fixture());
 
     // Call the plugin directly
-    plugin(files, metalsmithMock, () => {
+    plugin(files, ms, () => {
       const content = files['complex-paths.html'].contents.toString();
-      
+
       // Verify various path transformations
-      assert(content.includes('<a href="/sub/directory/">Root link</a>'), 
-        'Root link should have base path');
-      assert(content.includes('<a href="/sub/directory/page">Page without trailing slash</a>'), 
-        'Page link should have base path');
-      assert(content.includes('<a href="/sub/directory/deep/path/page.html">Deep path</a>'), 
-        'Deep path should have base path');
-      assert(content.includes('<a href="/sub/directory/path?query=test#fragment">Link with query and fragment</a>'), 
-        'Link with query and fragment should have base path');
-        
+      assert(content.includes('<a href="/sub/directory/">Root link</a>'), 'Root link should have base path');
+      assert(
+        content.includes('<a href="/sub/directory/page">Page without trailing slash</a>'),
+        'Page link should have base path'
+      );
+      assert(
+        content.includes('<a href="/sub/directory/deep/path/page.html">Deep path</a>'),
+        'Deep path should have base path'
+      );
+      assert(
+        content.includes('<a href="/sub/directory/path?query=test#fragment">Link with query and fragment</a>'),
+        'Link with query and fragment should have base path'
+      );
+
       done();
     });
   });
 
   // Test processing of all HTML element types
-  it('should process URLs in all supported HTML elements', (done) => {
+  it('should process URLs in all supported HTML elements', (_t, done) => {
     // Create plugin instance with base path
-    const plugin = metalsmithLinks({ 
+    const plugin = metalsmithLinks({
       hostnames: ['example.com'],
       basePath: 'app'
     });
@@ -298,12 +305,12 @@ describe('metalsmith-safe-links (ESM)', () => {
     };
 
     // Mock Metalsmith object
-    const metalsmithMock = { debug: () => () => {} };
+    const ms = Metalsmith(fixture());
 
     // Call the plugin directly
-    plugin(files, metalsmithMock, () => {
+    plugin(files, ms, () => {
       const content = files['all-elements-test.html'].contents.toString();
-      
+
       // Verify local URLs have base path prepended
       assert(content.includes('href="/app/styles.css"'), 'Link element should have base path');
       assert(content.includes('src="/app/script.js"'), 'Script element should have base path');
@@ -319,20 +326,24 @@ describe('metalsmith-safe-links (ESM)', () => {
       assert(content.includes('data="/app/object.pdf"'), 'Object element should have base path');
       assert(content.includes('src="/app/embed.swf"'), 'Embed element should have base path');
       assert(content.includes('href="/app/area/"'), 'Area element should have base path');
-      
+
       // Verify external anchor gets target/rel but external image doesn't
-      assert(content.includes('href="https://external.com/page/" target="_blank" rel="noopener noreferrer"'), 
-        'External anchor should have target and rel');
-      assert(content.includes('src="https://external.com/external.jpg"') && !content.includes('external.jpg" target='), 
-        'External image should not have target attribute');
-        
+      assert(
+        content.includes('href="https://external.com/page/" target="_blank" rel="noopener noreferrer"'),
+        'External anchor should have target and rel'
+      );
+      assert(
+        content.includes('src="https://external.com/external.jpg"') && !content.includes('external.jpg" target='),
+        'External image should not have target attribute'
+      );
+
       done();
     });
   });
 
-  it('should handle relative URLs with base path prepending', (done) => {
+  it('should handle relative URLs with base path prepending', (_t, done) => {
     // Create plugin instance with base path
-    const plugin = metalsmithLinks({ 
+    const plugin = metalsmithLinks({
       hostnames: ['example.com'],
       basePath: 'app'
     });
@@ -355,12 +366,12 @@ describe('metalsmith-safe-links (ESM)', () => {
     };
 
     // Mock Metalsmith object
-    const metalsmithMock = { debug: () => () => {} };
+    const ms = Metalsmith(fixture());
 
     // Call the plugin directly
-    plugin(files, metalsmithMock, () => {
+    plugin(files, ms, () => {
       const content = files['relative-urls-test.html'].contents.toString();
-      
+
       // Verify root-relative URLs (starting with /) get base path prepended
       assert(content.includes('content="/app/images/social.jpg"'), 'Meta og:image should get base path');
       assert(content.includes('content="/app/images/twitter.jpg"'), 'Meta twitter:image should get base path');
@@ -368,18 +379,18 @@ describe('metalsmith-safe-links (ESM)', () => {
       assert(content.includes('src="/app/js/script.js"'), 'Root-relative script should get base path');
       assert(content.includes('href="/app/relative-link"'), 'Root-relative link should get base path');
       assert(content.includes('src="/app/images/photo.jpg"'), 'Root-relative image should get base path');
-      
+
       // Verify path-relative URLs (./  ../) remain unchanged
       assert(content.includes('src="./local-image.jpg"'), 'Path-relative image should be unchanged');
       assert(content.includes('href="../parent-page"'), 'Parent-relative link should be unchanged');
-        
+
       done();
     });
   });
 
-  it('should handle relative URLs without basePath', (done) => {
+  it('should handle relative URLs without basePath', (_t, done) => {
     // Create plugin instance without base path
-    const plugin = metalsmithLinks({ 
+    const plugin = metalsmithLinks({
       hostnames: ['example.com']
       // No basePath
     });
@@ -395,23 +406,23 @@ describe('metalsmith-safe-links (ESM)', () => {
     };
 
     // Mock Metalsmith object
-    const metalsmithMock = { debug: () => () => {} };
+    const ms = Metalsmith(fixture());
 
     // Call the plugin directly
-    plugin(files, metalsmithMock, () => {
+    plugin(files, ms, () => {
       const content = files['no-basepath-relative-test.html'].contents.toString();
-      
+
       // Verify relative URLs remain unchanged when no basePath
       assert(content.includes('href="/page"'), 'Root-relative link should be unchanged without basePath');
       assert(content.includes('src="/image.jpg"'), 'Root-relative image should be unchanged without basePath');
-        
+
       done();
     });
   });
 
   // Test inline style URL processing
-  it('should process URLs in inline styles', (done) => {
-    const metal = metalsmith(fixture());
+  it('should process URLs in inline styles', (_t, done) => {
+    const metal = Metalsmith(fixture());
 
     metal
       .use(
@@ -430,9 +441,9 @@ describe('metalsmith-safe-links (ESM)', () => {
       });
   });
 
-  it('should handle inline styles with base path correctly', (done) => {
+  it('should handle inline styles with base path correctly', (_t, done) => {
     // Create plugin instance with base path
-    const plugin = metalsmithLinks({ 
+    const plugin = metalsmithLinks({
       hostnames: ['example.com'],
       basePath: 'assets'
     });
@@ -452,37 +463,43 @@ describe('metalsmith-safe-links (ESM)', () => {
     };
 
     // Mock Metalsmith object
-    const metalsmithMock = { debug: () => () => {} };
+    const ms = Metalsmith(fixture());
 
     // Call the plugin directly
-    plugin(files, metalsmithMock, () => {
+    plugin(files, ms, () => {
       const content = files['inline-styles-basepath.html'].contents.toString();
-      
+
       // Verify local URLs have base path prepended
-      assert(content.includes("background-image: url('/assets/images/bg.jpg')"), 
-        'Local style URL should have base path');
-      assert(content.includes("background: url(/assets/icons/icon.svg) no-repeat"), 
-        'Local style URL in complex background should have base path');
-      assert(content.includes("background-image: url('/assets/icons/icon.png')"), 
-        'Root-relative style URL should have base path');
-      
+      assert(
+        content.includes("background-image: url('/assets/images/bg.jpg')"),
+        'Local style URL should have base path'
+      );
+      assert(
+        content.includes('background: url(/assets/icons/icon.svg) no-repeat'),
+        'Local style URL in complex background should have base path'
+      );
+      assert(
+        content.includes("background-image: url('/assets/icons/icon.png')"),
+        'Root-relative style URL should have base path'
+      );
+
       // Verify external URLs remain unchanged
-      assert(content.includes("background-image: url('https://external.com/images/bg.jpg')"), 
-        'External style URL should remain unchanged');
-      
+      assert(
+        content.includes("background-image: url('https://external.com/images/bg.jpg')"),
+        'External style URL should remain unchanged'
+      );
+
       // Verify special URLs are preserved
-      assert(content.includes("url('data:image/png;base64,abc123')"), 
-        'Data URL should be preserved');
-      assert(content.includes("url('#pattern')"), 
-        'Hash URL should be preserved');
-        
+      assert(content.includes("url('data:image/png;base64,abc123')"), 'Data URL should be preserved');
+      assert(content.includes("url('#pattern')"), 'Hash URL should be preserved');
+
       done();
     });
   });
 
-  it('should handle various CSS url() formats in styles', (done) => {
+  it('should handle various CSS url() formats in styles', (_t, done) => {
     // Create plugin instance
-    const plugin = metalsmithLinks({ 
+    const plugin = metalsmithLinks({
       hostnames: ['mysite.com'],
       basePath: 'cdn'
     });
@@ -501,35 +518,27 @@ describe('metalsmith-safe-links (ESM)', () => {
     };
 
     // Mock Metalsmith object
-    const metalsmithMock = { debug: () => () => {} };
+    const ms = Metalsmith(fixture());
 
     // Call the plugin directly
-    plugin(files, metalsmithMock, () => {
+    plugin(files, ms, () => {
       const content = files['css-formats.html'].contents.toString();
-      
+
       // Verify all formats are processed correctly
       assert(content.includes("url('/cdn/bg1.jpg')"), 'Single quotes format should work');
       assert(content.includes('url(&quot;/cdn/bg2.jpg&quot;)'), 'Double quotes format should work');
-      assert(content.includes("url(/cdn/bg3.jpg)"), 'No quotes format should work');
+      assert(content.includes('url(/cdn/bg3.jpg)'), 'No quotes format should work');
       assert(content.includes("url( '/cdn/bg4.jpg' )"), 'Spaces format should work');
       assert(content.includes("url('/cdn/gradient.png')"), 'Complex gradient format should work');
-        
+
       done();
     });
   });
 
-  // Test debug function usage
-  it('should use provided debug function', () => {
-    // Create a debug function tracker
-    let debugCalled = false;
-    const debugFn = () => {
-      debugCalled = true;
-    };
-
-    // Mock Metalsmith object with debug function
-    const metalsmithMock = {
-      debug: () => debugFn
-    };
+  // Test that the plugin processes links using a real Metalsmith instance's debug
+  it('should use a real Metalsmith instance to process links', (_t, done) => {
+    // Real Metalsmith instance supplies a real .debug()
+    const ms = Metalsmith(fixture());
 
     // Create plugin instance
     const plugin = metalsmithLinks({ hostnames: ['example.com'] });
@@ -541,10 +550,14 @@ describe('metalsmith-safe-links (ESM)', () => {
       }
     };
 
-    // Call the plugin directly
-    plugin(files, metalsmithMock, () => {});
+    // Call the plugin directly with a real instance and assert inside the callback
+    plugin(files, ms, () => {
+      const content = files['debug-test.html'].contents.toString();
 
-    // Verify debug function was called
-    assert.strictEqual(debugCalled, true, 'Debug function should have been called');
+      // The local example.com href should be stripped to a root-relative path
+      assert(content.includes('<a href="/test">Test</a>'), 'Local link should be stripped to a root-relative href');
+
+      done();
+    });
   });
 });

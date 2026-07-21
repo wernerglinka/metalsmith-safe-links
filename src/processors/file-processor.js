@@ -1,5 +1,5 @@
 import * as cheerio from 'cheerio';
-import { extname } from 'path';
+import { extname } from 'node:path';
 import { urlSelectors } from '../config/selectors.js';
 import { processUrlElement } from './url-processor.js';
 import { processElementStyle } from './style-processor.js';
@@ -9,7 +9,7 @@ import { processElementStyle } from './style-processor.js';
  * @param {string} filePath - Path to check
  * @returns {boolean} True if file is HTML
  */
-export const isHTMLFile = ( filePath ) => /\.html$|\.htm$/i.test( extname( filePath ) );
+export const isHTMLFile = (filePath) => /\.html$|\.htm$/i.test(extname(filePath));
 
 /**
  * Process a single HTML file
@@ -21,10 +21,10 @@ export const isHTMLFile = ( filePath ) => /\.html$|\.htm$/i.test( extname( fileP
  * @param {Function} params.debug - Debug function
  * @returns {Object} Processing statistics
  */
-export const processHTMLFile = ( file, fileData, { hostnames, opts, debug } ) => {
+export const processHTMLFile = (file, fileData, { hostnames, opts, debug }) => {
   // Validate file contents before processing
-  if ( !fileData.contents || !Buffer.isBuffer( fileData.contents ) ) {
-    debug( `Skipping ${file}: invalid or missing file contents` );
+  if (!fileData.contents || !Buffer.isBuffer(fileData.contents)) {
+    debug(`Skipping ${file}: invalid or missing file contents`);
     return {
       linkCount: 0,
       localLinkCount: 0,
@@ -38,9 +38,9 @@ export const processHTMLFile = ( file, fileData, { hostnames, opts, debug } ) =>
   const contents = fileData.contents.toString();
 
   // Load content into cheerio
-  const $ = cheerio.load( contents, {
+  const $ = cheerio.load(contents, {
     decodeEntities: false
-  } );
+  });
 
   // Process all elements with URL attributes
   let linkCount = 0;
@@ -51,46 +51,48 @@ export const processHTMLFile = ( file, fileData, { hostnames, opts, debug } ) =>
   let externalStyleCount = 0;
 
   // Process each selector type
-  urlSelectors.forEach( ( { selector, attr, isAnchor } ) => {
-    $( selector ).each( function() {
-      const element = $( this );
-      const elementAttributes = element[ 0 ].attribs;
-      const url = elementAttributes[ attr ];
+  urlSelectors.forEach(({ selector, attr, isAnchor }) => {
+    $(selector).each(function () {
+      const element = $(this);
+      const elementAttributes = element[0].attribs;
+      const url = elementAttributes[attr];
 
-      if ( !url || typeof url !== 'string' ) {
+      if (!url || typeof url !== 'string') {
         return;
       }
 
       linkCount++;
 
       // Process the URL element
-      const { localCount, externalCount } = processUrlElement( { element, attr, url, isAnchor, hostnames, opts, debug } );
+      const { localCount, externalCount } = processUrlElement({ element, attr, url, isAnchor, hostnames, opts, debug });
       localLinkCount += localCount;
       externalLinkCount += externalCount;
-    } );
-  } );
+    });
+  });
 
   // Process inline styles on all elements with style attributes
-  $( '[style]' ).each( function() {
-    const element = $( this );
-    const { localCount, externalCount, processed } = processElementStyle( { element, hostnames, opts, debug } );
-    
-    if ( processed ) {
+  $('[style]').each(function () {
+    const element = $(this);
+    const { localCount, externalCount, processed } = processElementStyle({ element, hostnames, opts, debug });
+
+    if (processed) {
       styleCount++;
       localStyleCount += localCount;
       externalStyleCount += externalCount;
     }
-  } );
+  });
 
   // Save statistics
-  debug( `File ${ file }: processed ${ linkCount } links (${ localLinkCount } local, ${ externalLinkCount } external), ${ styleCount } inline styles (${ localStyleCount } local, ${ externalStyleCount } external)` );
+  debug(
+    `File ${file}: processed ${linkCount} links (${localLinkCount} local, ${externalLinkCount} external), ${styleCount} inline styles (${localStyleCount} local, ${externalStyleCount} external)`
+  );
 
   // Update file contents
-  fileData.contents = Buffer.from( $.html() );
+  fileData.contents = Buffer.from($.html());
 
-  return { 
-    linkCount, 
-    localLinkCount, 
+  return {
+    linkCount,
+    localLinkCount,
     externalLinkCount,
     styleCount,
     localStyleCount,

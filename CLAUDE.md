@@ -1,149 +1,173 @@
-# metalsmith-safe-links - Project Notes
+# metalsmith-safe-links - Development Context
+
+This file gives Claude operational context for working in this plugin. Plugin
+behavior is documented in [README.md](README.md) and the architecture
+rationale in [docs/THEORY.md](docs/THEORY.md) — don't duplicate them here.
+
+## Project Overview
+
+Rewrites URLs across a built HTML site: strips `protocol://hostname` from
+internal links (those matching the `hostnames` allow-list), prepends an
+optional `basePath` to internal and root-relative URLs, and adds
+`target="_blank" rel="noopener noreferrer"` to external anchors. Runs after
+Markdown and layouts have produced HTML. Parses with Cheerio; element/attribute
+coverage lives in `src/config/selectors.js`, transforms in `src/processors/`.
+
+ESM-only Metalsmith plugin, published directly from `src/` (no build step),
+targeting Node.js 22+. CommonJS consumers can still `require()` it via
+Node 22's stable `require(esm)` support. The one runtime dependency is
+`cheerio`.
+
+Licensed **ISC** (not MIT) — leave it; both are acceptable and the
+`package.json` `license` field must match the LICENSE file text.
 
 ## MCP Server Integration (CRITICAL)
 
-**IMPORTANT**: This plugin was created with `metalsmith-plugin-mcp-server`. When working on this plugin, AI assistants (Claude) MUST use the MCP server tools rather than creating their own implementations.
+**IMPORTANT**: This plugin was created with `metalsmith-plugin-mcp-server`.
+When working on this plugin, AI assistants (Claude) MUST use the MCP server
+tools rather than improvising equivalents.
 
 ### Essential MCP Commands
 
 ```bash
-# List all available templates
-list-templates
-
-# Get specific template content (use these exactly as provided)
-get-template plugin/CLAUDE.md
+list-templates                          # See what's available
+get-template plugin/CLAUDE.md           # Retrieve exact template content
+get-template configs/biome.json
 get-template configs/release-it.json
-get-template configs/eslint.config.js
-
-# Validate plugin and get actionable recommendations
-validate .
-
-# Generate configuration files
-configs .
-
-# Show recommended configuration templates
-show-template release-it
-show-template eslint
-
-# Update dependencies
-update-deps .
+validate .                              # Plugin validation + recommendations
+diff-template .                         # Drift check vs current scaffold
+configs .                               # Generate config files
+show-template release-it                # Reference config templates
+update-deps .                           # Dependency update
 ```
 
 ### CRITICAL RULES for AI Assistants
 
-1. **ALWAYS use MCP server templates verbatim** - Never create simplified versions
-2. **ALWAYS use `list-templates` first** to see what's available
-3. **ALWAYS use `get-template`** to retrieve exact template content
-4. **NEVER improvise or create custom implementations** when MCP server provides templates
-5. **When validation recommends templates**, use the exact commands provided
-6. **If a command seems unclear**, ask the user for clarification rather than improvising
+1. **Use MCP server templates verbatim** — never paraphrase or "simplify"
+2. **Run `list-templates` before guessing** at template names
+3. **When `validate` produces a recommendation, copy it exactly** — including
+   the exact command suggested
+4. **Ask the user** before modifying `.release-it.json`, `package.json`,
+   `biome.json`, or any other `.json` / `.yml` / `.config.js` file
+5. **Never set `npm.publish` to `true`** in `.release-it.json` — releases
+   here are deliberately manual
 
-### Common Mistakes to AVOID
+## Plugin Development Rules
 
-**❌ Wrong Approach:**
-- Creating custom CLAUDE.md content instead of using `get-template plugin/CLAUDE.md`
-- Scaffolding entire new plugins when you just need a template
-- Making up template content or "simplifying" official templates
-- Ignoring validation recommendations
-- Using commands like `npx metalsmith-plugin-mcp-server scaffold ./ CLAUDE.md claude-context`
+### Use Metalsmith's native methods
 
-**✅ Correct Approach:**
-- Use `list-templates` to see what's available
-- Use `get-template <template-name>` to get exact content
-- Follow validation recommendations exactly as provided
-- Ask for clarification when commands seem confusing
-- Always use official templates verbatim
+Prefer the methods Metalsmith provides on the instance over external
+packages:
 
-### Quick Commands
-
-**Quality & Validation:**
-```bash
-npx metalsmith-plugin-mcp-server validate . --functional  # Validate with MCP server
-npm test                                                   # Run tests with coverage
-npm run lint                                              # Lint and fix code
-```
-
-**Release Process:**
-```bash
-npm run release:patch   # Bug fixes (1.5.4 → 1.5.5)
-npm run release:minor   # New features (1.5.4 → 1.6.0)  
-npm run release:major   # Breaking changes (1.5.4 → 2.0.0)
-```
-
-**Development:**
-```bash
-npm run build          # Build ESM/CJS versions
-npm run test:coverage  # Run tests with detailed coverage
-```
-
-
-
-This plugin processes HTML files to automatically handle URLs across all HTML elements:
-- Strips protocol/hostname from internal URLs (making them relative) for ALL elements
-- Adds `target="_blank"` and `rel="noopener noreferrer"` to external anchor links only
-- Supports base path prepending for subdirectory deployments
-
-**Processes URLs in:** `<a href>`, `<link href>`, `<script src>`, `<img src>`, `<iframe src>`, `<source src>`, `<track src>`, `<embed src>`, `<form action>`, `<object data>`, `<video poster>`, `<area href>`
-
-**Perfect for sites deployed in subdirectories** - handles all asset references in one place.
-
-**Current Status**: 100% MCP Server Quality Score ✅
-
-## Quick Commands
-
-**Quality & Validation:**
-```bash
-npx metalsmith-plugin-mcp-server validate . --functional  # Validate with MCP server
-npm test                                                   # Run tests with coverage
-npm run lint                                              # Lint and fix code
-```
-
-**Release Process:**
-```bash
-npm run release:patch   # Bug fixes (1.5.4 → 1.5.5)
-npm run release:minor   # New features (1.5.4 → 1.6.0)  
-npm run release:major   # Breaking changes (1.5.4 → 2.0.0)
-```
-
-**Development:**
-```bash
-npm run build          # Build ESM/CJS versions
-npm run test:coverage  # Run tests with detailed coverage
-```
-
-## Plugin Functionality
-
-**Input**: HTML files with links
-**Output**: HTML files with processed links
-
-**Example transformations:**
-- `https://www.mysite.com/page/` → `/page/` (internal links made relative)
-- `https://external.com/` → `https://external.com/` + `target="_blank" rel="noopener noreferrer"`
-
-**Configuration:**
 ```javascript
-metalsmithSafeLinks({
-  hostnames: ['www.mysite.com', 'staging.mysite.com']  // Your internal domains
-})
+// ❌                                    // ✅
+require('debug')('')                     metalsmith.debug('')
+require('minimatch')(file, pattern)      metalsmith.match(pattern, file)
+process.env.NODE_ENV                     metalsmith.env('NODE_ENV')
+path.join(dir, file)                     metalsmith.path(file)
 ```
 
-## Recent Updates (v1.5.4)
+The validator flags external packages when a native method exists.
 
-✅ **Enhanced to meet MCP Server quality standards:**
-- Added secure release scripts using GitHub CLI (`npm run release:patch/minor/major`)
-- Added `test:coverage` script for detailed coverage reporting  
-- Updated all dependencies to latest versions
-- Fixed token handling in `.release-it.json` (now uses `GH_TOKEN`)
-- Added `.editorconfig` for consistent formatting
-- Achieved 100% MCP Server quality score
+### Never mock Metalsmith in tests
 
-🔧 **Technical improvements:**
-- Dual module support (ESM/CommonJS) working correctly
-- Test coverage at 97.16% with comprehensive test suite
-- Secure release process using `./scripts/release.sh`
-- All quality checks passing (lint, tests, coverage)
+Use a real `Metalsmith` instance. Metalsmith is in `devDependencies` for
+exactly this reason. Mocking `metalsmith()`, `metalsmith.match`,
+`metalsmith.debug`, `metalsmith.env`, `metalsmith.path`, or plugin invocation
+has repeatedly hidden integration bugs that only surfaced in production. The
+unit-style tests here build in-memory `files` objects but still pass a real
+`Metalsmith` instance so `metalsmith.debug()` is the genuine implementation.
 
-💡 **For future development:**
-- Use MCP server for validation: `npx metalsmith-plugin-mcp-server validate . --functional`
-- Use MCP server for dependency updates: `npx metalsmith-plugin-mcp-server update-deps .`
-- Configuration templates available via: `npx metalsmith-plugin-mcp-server show-template <type>`
+Mocking unrelated systems (network, non-Metalsmith fs concerns) is fine.
+
+### Metalsmith goes in devDependencies, never peerDependencies
+
+The plugin code itself never imports Metalsmith — it receives the instance
+as a parameter. Tests import Metalsmith directly. Users have their own
+Metalsmith install in their project.
+
+## Pre-commit workflow
+
+Before any commit or release, run in order:
+
+```bash
+npm run lint       # Biome: lint + format with autofix
+npm run format     # Format only
+npm test           # node:test runner against src/
+```
+
+If any step fails, fix the underlying issue and re-run. Don't skip hooks.
+
+## Release commands
+
+Only after the pre-commit workflow succeeds:
+
+```bash
+npm run release:patch   # Bug fix (1.2.3 → 1.2.4)
+npm run release:minor   # New feature (1.2.3 → 1.3.0)
+npm run release:major   # Breaking change (1.2.3 → 2.0.0)
+```
+
+Releases use `./scripts/release.sh` which retrieves the GitHub token from
+`gh auth token` and calls release-it. npm publishing is intentionally
+manual.
+
+## Before releasing: re-read the user-facing docs
+
+Before any `npm run release:*`, read the user-facing docs end-to-end and
+update anything that's drifted from current behavior. Drift goes unnoticed
+during code-focused work, then ships, then needs a follow-up patch release
+purely for docs.
+
+Files to audit:
+
+- [README.md](README.md) — installation, usage examples, options, badges
+- [docs/THEORY.md](docs/THEORY.md) — architecture and design rationale
+
+Specific things to grep for: option names and defaults (`hostnames`,
+`basePath`) that no longer match `src/`, the element/attribute list versus
+`src/config/selectors.js`, code examples that import removed exports, a wrong
+DEBUG namespace in the Debug section, broken links to renamed sections.
+
+If the change being released doesn't affect any user-visible surface, say so
+explicitly when reporting the audit — don't claim drift you didn't find. But
+default to reading.
+
+## File organization
+
+```
+/
+├── src/
+│   ├── index.js              # Plugin entry — filter HTML, process each file
+│   ├── config/
+│   │   └── selectors.js      # Element/attribute URL map
+│   └── processors/           # file, url, style processors
+├── test/
+│   ├── index.test.js         # node:test against src/ directly
+│   └── fixtures/markup/      # Sample site (src/, expected/, build/)
+├── docs/
+│   └── THEORY.md             # Architecture + invariants
+└── .github/
+    ├── workflows/            # test.yml, test-matrix.yml, claude-code.yml
+    └── dependabot.yml
+```
+
+## Tooling
+
+- **Biome** for lint + format (single tool, single config: `biome.json`)
+- **node:test** + `node:assert/strict` for testing
+- **Native coverage** via `node --test --experimental-test-coverage`
+- **Node >= 22** required
+
+## When validation flags something
+
+The MCP server's `validate` tool can return:
+
+- `failed` — must-fix (license missing, wrong package shape)
+- `warnings` — quality concern (low coverage, stub THEORY.md)
+- `recommendations` — optional with exact command to run
+
+Implement recommendations as written. The validator catches real maintainer
+feedback patterns (marketing language, hardcoded values that should be
+options, CJS examples in ESM-only plugins, performance anti-patterns,
+English-only output strings). Run `validate .` and copy the suggested fixes.
