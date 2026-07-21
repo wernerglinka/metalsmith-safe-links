@@ -30,7 +30,6 @@ This provides a comprehensive solution for sites deployed in subdirectories, han
 [![license: ISC][license-badge]][license-url]
 [![coverage][coverage-badge]][coverage-url]
 [![ESM/CommonJS][modules-badge]][npm-url]
-[![Known Vulnerabilities](https://snyk.io/test/npm/metalsmith-safe-links/badge.svg)](https://snyk.io/test/npm/metalsmith-safe-links)
 
 ## Installation
 
