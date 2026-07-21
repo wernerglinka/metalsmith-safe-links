@@ -184,6 +184,6 @@ Code released under [the ISC license](https://github.com/wernerglinka/metalsmith
 [metalsmith-url]: https://metalsmith.io
 [license-badge]: https://img.shields.io/github/license/wernerglinka/metalsmith-safe-links
 [license-url]: LICENSE
-[coverage-badge]: https://img.shields.io/badge/test%20coverage-94%25-brightgreen
+[coverage-badge]: https://img.shields.io/badge/test%20coverage-025-red
 [coverage-url]: https://github.com/wernerglinka/metalsmith-safe-links/actions/workflows/test.yml
 [modules-badge]: https://img.shields.io/badge/module-ESM-blue
